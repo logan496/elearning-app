@@ -4,17 +4,20 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Menu, X } from "lucide-react"
 import { useState } from "react"
+import { useI18n } from "@/lib/i18n-context"
+import { LanguageSwitcher } from "./language-switcher"
 
 export function Navigation() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
+  const { t } = useI18n()
 
   const links = [
-    { href: "/", label: "Accueil" },
-    { href: "/podcasts", label: "Podcasts" },
-    { href: "/equipe", label: "Équipe" },
-    { href: "/chat", label: "Chat" },
-    { href: "/login", label: "Connexion" },
+    { href: "/", label: t.nav.home },
+    { href: "/podcasts", label: t.nav.podcasts },
+    { href: "/equipe", label: t.nav.team },
+    { href: "/chat", label: t.nav.chat },
+    { href: "/login", label: t.nav.login },
   ]
 
   return (
@@ -39,6 +42,7 @@ export function Navigation() {
                     <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
                   </Link>
               ))}
+              <LanguageSwitcher />
             </div>
 
             {/* Mobile Menu Button */}
@@ -69,6 +73,9 @@ export function Navigation() {
                         {link.label}
                       </Link>
                   ))}
+                  <div className="px-4 py-2">
+                    <LanguageSwitcher />
+                  </div>
                 </div>
               </div>
           )}

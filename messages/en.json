@@ -1,0 +1,124 @@
+{
+  "nav": {
+    "home": "Home",
+    "podcasts": "Podcasts",
+    "team": "Team",
+    "chat": "Chat",
+    "login": "Login"
+  },
+  "home": {
+    "hero": {
+      "title": "Learn at your own pace with",
+      "subtitle": "A modern learning platform that transforms the way you acquire new skills",
+      "cta_start": "Start for free",
+      "cta_discover": "Discover courses"
+    },
+    "features": {
+      "title": "Our main challenges",
+      "subtitle": "Discover how EduLearn revolutionizes online learning",
+      "quality": {
+        "title": "Quality content",
+        "description": "Access courses created by recognized experts in their field, with regularly updated content"
+      },
+      "community": {
+        "title": "Active community",
+        "description": "Join a community of passionate learners and interact with experienced mentors"
+      },
+      "certifications": {
+        "title": "Recognized certifications",
+        "description": "Obtain certifications valued by companies to boost your professional career"
+      }
+    },
+    "video": {
+      "title": "Combining innovation, flexibility and excellence",
+      "description1": "EduLearn positions itself as a major player in online training. We offer innovative learning solutions adapted to the needs of modern learners.",
+      "description2": "Our platform combines interactive videos, practical exercises and personalized monitoring to guarantee your success.",
+      "cta": "Learn more"
+    },
+    "approach": {
+      "title": "A comprehensive approach for optimal learning",
+      "collaborative": {
+        "title": "Collaborative learning",
+        "description": "Work in groups on real projects and develop your team skills"
+      },
+      "personalized": {
+        "title": "Personalized path",
+        "description": "A program adapted to your level and professional goals"
+      },
+      "mentorship": {
+        "title": "Expert mentorship",
+        "description": "Benefit from the support of recognized professionals in their field"
+      }
+    },
+    "cta": {
+      "title": "Ready to start your journey?",
+      "subtitle": "Join thousands of learners who have already transformed their career with EduLearn",
+      "button": "Create a free account"
+    },
+    "footer": {
+      "tagline": "The learning platform that adapts to you",
+      "navigation": "Navigation",
+      "resources": "Resources",
+      "blog": "Blog",
+      "documentation": "Documentation",
+      "support": "Support",
+      "contact": "Contact",
+      "rights": "All rights reserved"
+    }
+  },
+  "podcasts": {
+    "title": "Our Podcasts",
+    "subtitle": "Discover inspiring conversations with industry experts",
+    "featured": "Featured",
+    "allPodcasts": "All Podcasts",
+    "duration": "min"
+  },
+  "team": {
+    "title": "Our Team",
+    "subtitle": "Meet the passionate experts who make EduLearn possible",
+    "mission": {
+      "title": "Our Mission",
+      "description": "At EduLearn, we believe that quality education should be accessible to everyone. Our team of experts is dedicated to creating engaging and effective learning experiences that transform lives and careers."
+    }
+  },
+  "chat": {
+    "title": "Messages",
+    "general": "General Chat",
+    "online": "online",
+    "placeholder": "Type your message...",
+    "send": "Send"
+  },
+  "login": {
+    "title": "Welcome back",
+    "subtitle": "Sign in to your account to continue",
+    "email": "Email",
+    "password": "Password",
+    "remember": "Remember me",
+    "forgot": "Forgot password?",
+    "signin": "Sign in",
+    "or": "Or continue with",
+    "noAccount": "Don't have an account?",
+    "signup": "Sign up",
+    "signupTitle": "Create an account",
+    "signupSubtitle": "Join EduLearn and start your learning journey",
+    "name": "Full name",
+    "confirmPassword": "Confirm password",
+    "createAccount": "Create account",
+    "hasAccount": "Already have an account?",
+    "steps": {
+      "title": "Get started in 3 steps",
+      "step1": {
+        "title": "Create your account",
+        "description": "Sign up in seconds with your email or social account"
+      },
+      "step2": {
+        "title": "Choose your path",
+        "description": "Select courses that match your goals and interests"
+      },
+      "step3": {
+        "title": "Start learning",
+        "description": "Access quality content and join our community"
+      }
+    }
+  }
+}

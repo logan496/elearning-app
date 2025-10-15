@@ -1,0 +1,124 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "podcasts": "Podcasts",
+    "team": "Équipe",
+    "chat": "Chat",
+    "login": "Connexion"
+  },
+  "home": {
+    "hero": {
+      "title": "Apprenez à votre rythme avec",
+      "subtitle": "Une plateforme d'apprentissage moderne qui transforme votre façon d'acquérir de nouvelles compétences",
+      "cta_start": "Commencer gratuitement",
+      "cta_discover": "Découvrir les cours"
+    },
+    "features": {
+      "title": "Nos enjeux principaux",
+      "subtitle": "Découvrez comment EduLearn révolutionne l'apprentissage en ligne",
+      "quality": {
+        "title": "Contenu de qualité",
+        "description": "Accédez à des cours créés par des experts reconnus dans leur domaine, avec des contenus régulièrement mis à jour"
+      },
+      "community": {
+        "title": "Communauté active",
+        "description": "Rejoignez une communauté d'apprenants passionnés et échangez avec des mentors expérimentés"
+      },
+      "certifications": {
+        "title": "Certifications reconnues",
+        "description": "Obtenez des certifications valorisées par les entreprises pour booster votre carrière professionnelle"
+      }
+    },
+    "video": {
+      "title": "Allier innovation, flexibilité et excellence",
+      "description1": "EduLearn se positionne comme un acteur majeur de la formation en ligne. Nous proposons des solutions d'apprentissage innovantes adaptées aux besoins des apprenants modernes.",
+      "description2": "Notre plateforme combine vidéos interactives, exercices pratiques et suivi personnalisé pour garantir votre réussite.",
+      "cta": "En savoir plus"
+    },
+    "approach": {
+      "title": "Une approche globale pour un apprentissage optimal",
+      "collaborative": {
+        "title": "Apprentissage collaboratif",
+        "description": "Travaillez en groupe sur des projets réels et développez vos compétences en équipe"
+      },
+      "personalized": {
+        "title": "Parcours personnalisé",
+        "description": "Un programme adapté à votre niveau et à vos objectifs professionnels"
+      },
+      "mentorship": {
+        "title": "Mentorat expert",
+        "description": "Bénéficiez de l'accompagnement de professionnels reconnus dans leur domaine"
+      }
+    },
+    "cta": {
+      "title": "Prêt à commencer votre parcours ?",
+      "subtitle": "Rejoignez des milliers d'apprenants qui ont déjà transformé leur carrière avec EduLearn",
+      "button": "Créer un compte gratuit"
+    },
+    "footer": {
+      "tagline": "La plateforme d'apprentissage qui s'adapte à vous",
+      "navigation": "Navigation",
+      "resources": "Ressources",
+      "blog": "Blog",
+      "documentation": "Documentation",
+      "support": "Support",
+      "contact": "Contact",
+      "rights": "Tous droits réservés"
+    }
+  },
+  "podcasts": {
+    "title": "Nos Podcasts",
+    "subtitle": "Découvrez des conversations inspirantes avec des experts du secteur",
+    "featured": "À la une",
+    "allPodcasts": "Tous les Podcasts",
+    "duration": "min"
+  },
+  "team": {
+    "title": "Notre Équipe",
+    "subtitle": "Rencontrez les experts passionnés qui rendent EduLearn possible",
+    "mission": {
+      "title": "Notre Mission",
+      "description": "Chez EduLearn, nous croyons que l'éducation de qualité devrait être accessible à tous. Notre équipe d'experts se consacre à créer des expériences d'apprentissage engageantes et efficaces qui transforment les vies et les carrières."
+    }
+  },
+  "chat": {
+    "title": "Messages",
+    "general": "Chat Général",
+    "online": "en ligne",
+    "placeholder": "Tapez votre message...",
+    "send": "Envoyer"
+  },
+  "login": {
+    "title": "Bon retour",
+    "subtitle": "Connectez-vous à votre compte pour continuer",
+    "email": "Email",
+    "password": "Mot de passe",
+    "remember": "Se souvenir de moi",
+    "forgot": "Mot de passe oublié ?",
+    "signin": "Se connecter",
+    "or": "Ou continuer avec",
+    "noAccount": "Pas encore de compte ?",
+    "signup": "S'inscrire",
+    "signupTitle": "Créer un compte",
+    "signupSubtitle": "Rejoignez EduLearn et commencez votre parcours d'apprentissage",
+    "name": "Nom complet",
+    "confirmPassword": "Confirmer le mot de passe",
+    "createAccount": "Créer un compte",
+    "hasAccount": "Vous avez déjà un compte ?",
+    "steps": {
+      "title": "Commencez en 3 étapes",
+      "step1": {
+        "title": "Créez votre compte",
+        "description": "Inscrivez-vous en quelques secondes avec votre email ou compte social"
+      },
+      "step2": {
+        "title": "Choisissez votre parcours",
+        "description": "Sélectionnez des cours qui correspondent à vos objectifs et intérêts"
+      },
+      "step3": {
+        "title": "Commencez à apprendre",
+        "description": "Accédez à du contenu de qualité et rejoignez notre communauté"
+      }
+    }
+  }
+}

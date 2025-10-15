@@ -1,7 +1,10 @@
+"use client"
+
 import { Navigation } from "@/components/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Play, Clock, Calendar } from "lucide-react"
+import { useI18n } from "@/lib/i18n-context"
 
 const podcasts = [
   {
@@ -55,109 +58,111 @@ const podcasts = [
 ]
 
 export default function PodcastsPage() {
+  const { t } = useI18n()
+
   return (
-    <div className="min-h-screen">
-      <Navigation />
+      <div className="min-h-screen">
+        <Navigation />
 
-      <div className="pt-24 pb-20 px-4 lg:px-8">
-        <div className="container mx-auto">
-          {/* Header */}
-          <div className="text-center mb-16">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              Nos <span className="text-primary">Podcasts</span>
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto text-pretty leading-relaxed">
-              Écoutez nos experts partager leurs connaissances et leurs expériences pour enrichir votre apprentissage
-            </p>
-          </div>
-
-          {/* Featured Podcast */}
-          <Card className="mb-16 overflow-hidden border-2 border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]">
-            <div className="grid lg:grid-cols-2 gap-0">
-              <div className="aspect-video lg:aspect-auto bg-muted relative group">
-                <img
-                  src="/featured-podcast-studio.jpg"
-                  alt="Podcast en vedette"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <Button
-                  size="lg"
-                  className="absolute bottom-6 left-6 rounded-full w-16 h-16 p-0 hover:scale-110 transition-transform duration-200 hover:shadow-xl animate-pulse"
-                >
-                  <Play className="w-6 h-6 ml-1" fill="currentColor" />
-                </Button>
-              </div>
-              <CardContent className="p-8 lg:p-12 flex flex-col justify-center">
-                <div className="inline-block px-3 py-1 bg-primary/10 text-primary text-sm font-semibold rounded-full mb-4 w-fit">
-                  En vedette
-                </div>
-                <h2 className="text-3xl md:text-4xl font-bold mb-4 text-balance">L'avenir de l'éducation en ligne</h2>
-                <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                  Une discussion approfondie sur les innovations qui transforment l'apprentissage numérique et les
-                  opportunités qu'elles créent pour les apprenants du monde entier.
-                </p>
-                <div className="flex items-center gap-6 text-sm text-muted-foreground mb-6">
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4" />
-                    <span>62 min</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    <span>20 Jan 2025</span>
-                  </div>
-                </div>
-                <Button size="lg" className="w-fit hover:scale-105 transition-transform duration-200 hover:shadow-lg">
-                  Écouter maintenant
-                </Button>
-              </CardContent>
+        <div className="pt-24 pb-20 px-4 lg:px-8">
+          <div className="container mx-auto">
+            {/* Header */}
+            <div className="text-center mb-16">
+              <h1 className="text-5xl md:text-6xl font-bold mb-6">
+                {t.podcasts.title.split(" ")[0]} <span className="text-primary">{t.podcasts.title.split(" ")[1]}</span>
+              </h1>
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto text-pretty leading-relaxed">
+                {t.podcasts.subtitle}
+              </p>
             </div>
-          </Card>
 
-          {/* Podcast Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {podcasts.map((podcast) => (
-              <Card
-                key={podcast.id}
-                className="overflow-hidden group hover:shadow-2xl transition-all duration-300 hover:border-primary/50 hover:scale-105"
-              >
-                <div className="aspect-video bg-muted relative overflow-hidden">
+            {/* Featured Podcast */}
+            <Card className="mb-16 overflow-hidden border-2 border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]">
+              <div className="grid lg:grid-cols-2 gap-0">
+                <div className="aspect-video lg:aspect-auto bg-muted relative group">
                   <img
-                    src={podcast.image || "/placeholder.svg"}
-                    alt={podcast.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      src="/featured-podcast-studio.jpg"
+                      alt="Podcast en vedette"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
-                    <Button
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <Button
                       size="lg"
-                      className="rounded-full w-14 h-14 p-0 scale-90 group-hover:scale-100 transition-transform duration-300"
-                      variant="secondary"
-                    >
-                      <Play className="w-5 h-5 ml-0.5" fill="currentColor" />
-                    </Button>
-                  </div>
+                      className="absolute bottom-6 left-6 rounded-full w-16 h-16 p-0 hover:scale-110 transition-transform duration-200 hover:shadow-xl animate-pulse"
+                  >
+                    <Play className="w-6 h-6 ml-1" fill="currentColor" />
+                  </Button>
                 </div>
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold mb-3 text-balance group-hover:text-primary transition-colors duration-300">
-                    {podcast.title}
-                  </h3>
-                  <p className="text-muted-foreground mb-4 leading-relaxed text-sm">{podcast.description}</p>
-                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                    <div className="flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5" />
-                      <span>{podcast.duration}</span>
+                <CardContent className="p-8 lg:p-12 flex flex-col justify-center">
+                  <div className="inline-block px-3 py-1 bg-primary/10 text-primary text-sm font-semibold rounded-full mb-4 w-fit">
+                    {t.podcasts.featured}
+                  </div>
+                  <h2 className="text-3xl md:text-4xl font-bold mb-4 text-balance">L'avenir de l'éducation en ligne</h2>
+                  <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
+                    Une discussion approfondie sur les innovations qui transforment l'apprentissage numérique et les
+                    opportunités qu'elles créent pour les apprenants du monde entier.
+                  </p>
+                  <div className="flex items-center gap-6 text-sm text-muted-foreground mb-6">
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4" />
+                      <span>62 {t.podcasts.duration}</span>
                     </div>
-                    <div className="flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5" />
-                      <span>{podcast.date}</span>
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4" />
+                      <span>20 Jan 2025</span>
                     </div>
                   </div>
+                  <Button size="lg" className="w-fit hover:scale-105 transition-transform duration-200 hover:shadow-lg">
+                    Écouter maintenant
+                  </Button>
                 </CardContent>
-              </Card>
-            ))}
+              </div>
+            </Card>
+
+            {/* Podcast Grid */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {podcasts.map((podcast) => (
+                  <Card
+                      key={podcast.id}
+                      className="overflow-hidden group hover:shadow-2xl transition-all duration-300 hover:border-primary/50 hover:scale-105"
+                  >
+                    <div className="aspect-video bg-muted relative overflow-hidden">
+                      <img
+                          src={podcast.image || "/placeholder.svg"}
+                          alt={podcast.title}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+                        <Button
+                            size="lg"
+                            className="rounded-full w-14 h-14 p-0 scale-90 group-hover:scale-100 transition-transform duration-300"
+                            variant="secondary"
+                        >
+                          <Play className="w-5 h-5 ml-0.5" fill="currentColor" />
+                        </Button>
+                      </div>
+                    </div>
+                    <CardContent className="p-6">
+                      <h3 className="text-xl font-semibold mb-3 text-balance group-hover:text-primary transition-colors duration-300">
+                        {podcast.title}
+                      </h3>
+                      <p className="text-muted-foreground mb-4 leading-relaxed text-sm">{podcast.description}</p>
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        <div className="flex items-center gap-1.5">
+                          <Clock className="w-3.5 h-3.5" />
+                          <span>{podcast.duration}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <Calendar className="w-3.5 h-3.5" />
+                          <span>{podcast.date}</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+              ))}
+            </div>
           </div>
         </div>
       </div>
-    </div>
   )
 }

@@ -5,6 +5,7 @@ import { useState } from "react"
 import { Send, Search, Users, MoreVertical } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useI18n } from "@/lib/i18n-context"
 
 type Message = {
     id: number
@@ -100,6 +101,8 @@ const generalMessages: Message[] = [
 ]
 
 export default function ChatPage() {
+    const { t } = useI18n()
+
     const [selectedConversation, setSelectedConversation] = useState<Conversation>(conversations[0])
     const [message, setMessage] = useState("")
     const [messages, setMessages] = useState<Message[]>(generalMessages)
@@ -132,7 +135,7 @@ export default function ChatPage() {
                 <div className="w-80 border-r border-border bg-card flex flex-col">
                     {/* Header */}
                     <div className="p-4 border-b border-border">
-                        <h2 className="text-xl font-bold text-foreground mb-4">Messages</h2>
+                        <h2 className="text-xl font-bold text-foreground mb-4">{t.chat.title}</h2>
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
                             <Input
@@ -214,7 +217,7 @@ export default function ChatPage() {
                                     {selectedConversation.isGeneral && <Users size={16} className="text-primary" />}
                                 </h3>
                                 <p className="text-xs text-muted-foreground">
-                                    {selectedConversation.isGeneral ? "Tous les membres" : "En ligne"}
+                                    {selectedConversation.isGeneral ? "Tous les membres" : t.chat.online}
                                 </p>
                             </div>
                         </div>
@@ -267,7 +270,7 @@ export default function ChatPage() {
                         >
                             <Input
                                 type="text"
-                                placeholder="Écrivez votre message..."
+                                placeholder={t.chat.placeholder}
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
                                 className="flex-1 transition-all duration-200 focus:ring-2 focus:ring-primary"
