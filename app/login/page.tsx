@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { Navigation } from "@/components/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -9,10 +11,55 @@ import { Checkbox } from "@/components/ui/checkbox"
 import Link from "next/link"
 import { useState } from "react"
 import { useI18n } from "@/lib/i18n-context"
+import { useAuth } from "@/lib/contexts/auth-context"
+import { useRouter } from "next/navigation"
 
 export default function LoginPage() {
   const { t } = useI18n()
+  const { login, signup } = useAuth()
+  const router = useRouter()
   const [isLogin, setIsLogin] = useState(true)
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  })
+  const [error, setError] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError("")
+    setIsLoading(true)
+
+    try {
+      if (isLogin) {
+        await login({
+          email: formData.email,
+          password: formData.password,
+        })
+      } else {
+        if (formData.password !== formData.confirmPassword) {
+          setError("Les mots de passe ne correspondent pas")
+          setIsLoading(false)
+          return
+        }
+
+        await signup({
+          username: formData.name,
+          email: formData.email,
+          password: formData.password,
+        })
+      }
+      router.push("/")
+    } catch (err: any) {
+      console.error("[v0] Auth error:", err)
+      setError(err.response?.data?.message || "Une erreur est survenue. Veuillez réessayer.")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
       <div className="min-h-screen">
@@ -72,7 +119,13 @@ export default function LoginPage() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <form className="space-y-4">
+                    <form className="space-y-4" onSubmit={handleSubmit}>
+                      {error && (
+                          <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md text-destructive text-sm">
+                            {error}
+                          </div>
+                      )}
+
                       {!isLogin && (
                           <div className="space-y-2">
                             <Label htmlFor="name">{t.login.name}</Label>
@@ -81,6 +134,8 @@ export default function LoginPage() {
                                 type="text"
                                 placeholder="Jean Dupont"
                                 required
+                                value={formData.name}
+                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                 className="focus:scale-[1.01] transition-transform duration-200"
                             />
                           </div>
@@ -93,6 +148,8 @@ export default function LoginPage() {
                             type="email"
                             placeholder="vous@exemple.fr"
                             required
+                            value={formData.email}
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             className="focus:scale-[1.01] transition-transform duration-200"
                         />
                       </div>
@@ -104,6 +161,8 @@ export default function LoginPage() {
                             type="password"
                             placeholder="••••••••"
                             required
+                            value={formData.password}
+                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                             className="focus:scale-[1.01] transition-transform duration-200"
                         />
                       </div>
@@ -116,6 +175,8 @@ export default function LoginPage() {
                                 type="password"
                                 placeholder="••••••••"
                                 required
+                                value={formData.confirmPassword}
+                                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                                 className="focus:scale-[1.01] transition-transform duration-200"
                             />
                           </div>
@@ -142,8 +203,9 @@ export default function LoginPage() {
                           type="submit"
                           className="w-full hover:scale-105 transition-transform duration-200 hover:shadow-lg"
                           size="lg"
+                          disabled={isLoading}
                       >
-                        {isLogin ? t.login.signin : t.login.createAccount}
+                        {isLoading ? "Chargement..." : isLogin ? t.login.signin : t.login.createAccount}
                       </Button>
 
                       <div className="relative my-6">

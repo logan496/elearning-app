@@ -4,7 +4,8 @@
     "podcasts": "Podcasts",
     "team": "Team",
     "chat": "Chat",
-    "login": "Login"
+    "login": "Login",
+    "logout": "Logout"
   },
   "home": {
     "hero": {

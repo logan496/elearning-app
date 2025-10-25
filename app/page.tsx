@@ -3,7 +3,7 @@
 import { Navigation } from "@/components/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { BookOpen, Users, Award } from "lucide-react"
+import { BookOpen, Users, Award, CheckCircle } from "lucide-react"
 import Link from "next/link"
 import { useI18n } from "@/lib/i18n-context"
 
@@ -18,27 +18,72 @@ export default function HomePage() {
         <section className="relative pt-32 pb-20 px-4 lg:px-8 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-primary/5" />
           <div className="container mx-auto relative z-10">
-            <div className="max-w-4xl mx-auto text-center">
-              <h1 className="text-5xl md:text-7xl font-bold mb-6 text-balance animate-in fade-in slide-in-from-bottom-4 duration-700">
-                {t.home.hero.title} <span className="text-primary">EduLearn</span>
-              </h1>
-              <p className="text-xl md:text-2xl text-muted-foreground mb-8 text-pretty leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
-                {t.home.hero.subtitle}
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
-                <Button
-                    size="lg"
-                    className="text-lg px-8 hover:scale-105 transition-transform duration-200 hover:shadow-lg"
+            <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[80vh]">
+              {/* Left Content */}
+              <div className="space-y-8 animate-in fade-in slide-in-from-left-8 duration-700">
+                <div>
+                  <h1 className="text-4xl lg:text-6xl font-bold leading-tight mb-6">
+                    {t.home.hero.title} <span className="text-primary">EduLearn</span>
+                  </h1>
+                  <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-md leading-relaxed">
+                    {t.home.hero.subtitle}
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <Button
+                        size="lg"
+                        className="text-lg px-8 hover:scale-105 transition-transform duration-200 hover:shadow-lg"
+                    >
+                      {t.home.hero.cta_start}
+                    </Button>
+                    <Button
+                        size="lg"
+                        variant="outline"
+                        className="text-lg px-8 bg-transparent hover:scale-105 transition-transform duration-200 hover:bg-accent"
+                    >
+                      {t.home.hero.cta_discover}
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Benefits List */}
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-3 group">
+                    <div className="flex-shrink-0">
+                      <CheckCircle className="w-6 h-6 text-primary group-hover:scale-110 transition-transform duration-300" />
+                    </div>
+                    <span className="text-foreground font-medium text-lg">{t.home.features.quality.title}</span>
+                  </div>
+                  <div className="flex items-center space-x-3 group">
+                    <div className="flex-shrink-0">
+                      <CheckCircle className="w-6 h-6 text-primary group-hover:scale-110 transition-transform duration-300" />
+                    </div>
+                    <span className="text-foreground font-medium text-lg">{t.home.features.community.title}</span>
+                  </div>
+                  <div className="flex items-center space-x-3 group">
+                    <div className="flex-shrink-0">
+                      <CheckCircle className="w-6 h-6 text-primary group-hover:scale-110 transition-transform duration-300" />
+                    </div>
+                    <span className="text-foreground font-medium text-lg">{t.home.features.certifications.title}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Content - Image with Clip Path */}
+              <div className="relative h-full flex items-center animate-in fade-in slide-in-from-right-8 duration-700 delay-150">
+                <div
+                    className="relative w-full overflow-hidden transition-all duration-500 hover:scale-[1.02]"
+                    style={{
+                      clipPath: "polygon(0 0, 100% 0, 100% 100%, 83% 100%, 10% 82%)",
+                      minHeight: "500px",
+                    }}
                 >
-                  {t.home.hero.cta_start}
-                </Button>
-                <Button
-                    size="lg"
-                    variant="outline"
-                    className="text-lg px-8 bg-transparent hover:scale-105 transition-transform duration-200 hover:bg-accent"
-                >
-                  {t.home.hero.cta_discover}
-                </Button>
+                  <img
+                      src="/modern-online-learning-platform.jpg"
+                      alt="Plateforme d'apprentissage moderne"
+                      className="w-full h-full object-cover"
+                      style={{ objectPosition: "center" }}
+                  />
+                </div>
               </div>
             </div>
           </div>

@@ -2,22 +2,24 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, X } from "lucide-react"
+import { Menu, X, LogOut } from "lucide-react"
 import { useState } from "react"
 import { useI18n } from "@/lib/i18n-context"
 import { LanguageSwitcher } from "./language-switcher"
+import { useAuth } from "@/lib/contexts/auth-context"
 
 export function Navigation() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
   const { t } = useI18n()
+  const { isAuthenticated, logout } = useAuth()
 
   const links = [
     { href: "/", label: t.nav.home },
     { href: "/podcasts", label: t.nav.podcasts },
     { href: "/equipe", label: t.nav.team },
     { href: "/chat", label: t.nav.chat },
-    { href: "/login", label: t.nav.login },
+    ...(!isAuthenticated ? [{ href: "/login", label: t.nav.login }] : []),
   ]
 
   return (
@@ -42,6 +44,15 @@ export function Navigation() {
                     <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
                   </Link>
               ))}
+              {isAuthenticated && (
+                  <button
+                      onClick={logout}
+                      className="flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary transition-all duration-200 hover:scale-105 group"
+                  >
+                    <LogOut size={18} className="transition-transform duration-200 group-hover:translate-x-1" />
+                    {t.nav.logout}
+                  </button>
+              )}
               <LanguageSwitcher />
             </div>
 
@@ -73,6 +84,18 @@ export function Navigation() {
                         {link.label}
                       </Link>
                   ))}
+                  {isAuthenticated && (
+                      <button
+                          onClick={() => {
+                            logout()
+                            setIsOpen(false)
+                          }}
+                          className="flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary hover:bg-accent px-4 py-2 rounded-lg transition-all duration-200"
+                      >
+                        <LogOut size={18} />
+                        {t.nav.logout}
+                      </button>
+                  )}
                   <div className="px-4 py-2">
                     <LanguageSwitcher />
                   </div>
