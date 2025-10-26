@@ -33,7 +33,7 @@ interface DirectMessage {
 const pendingMessages = new Map<string, number>();
 
 // ✅ Récupérer l'URL depuis les variables d'environnement
-const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001';
+const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 export function useChatSocket() {
     const { token } = useAuth();
