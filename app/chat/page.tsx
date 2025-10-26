@@ -425,10 +425,12 @@ export default function ChatPage() {
         }
     }
 
+    const URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
     const loadAvailableUsers = async () => {
         setIsLoadingUsers(true)
         try {
-            const response = await fetch('http://localhost:3001/api/users', {
+            const response = await fetch(`${URL}/api/users`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
                 }
