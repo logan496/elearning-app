@@ -32,6 +32,9 @@ interface DirectMessage {
 // ✅ Map pour tracer les messages en attente
 const pendingMessages = new Map<string, number>();
 
+// ✅ Récupérer l'URL depuis les variables d'environnement
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001';
+
 export function useChatSocket() {
     const { token } = useAuth();
     const socketRef = useRef<Socket | null>(null);
@@ -40,9 +43,10 @@ export function useChatSocket() {
     useEffect(() => {
         if (!token) return;
 
-        const socket = io('http://localhost:3001/chat', {
+        // ✅ Utiliser l'URL configurée + le namespace /chat
+        const socket = io(`${SOCKET_URL}/chat`, {
             auth: { token },
-            transports: ['websocket'],
+            transports: ['websocket', 'polling'], // ✅ Fallback sur polling
             reconnection: true,
             reconnectionAttempts: 5,
             reconnectionDelay: 1000,
@@ -51,7 +55,7 @@ export function useChatSocket() {
         socketRef.current = socket;
 
         socket.on('connect', () => {
-            console.log('✅ Socket connected');
+            console.log('✅ Socket connected to', SOCKET_URL);
             setIsConnected(true);
         });
 
