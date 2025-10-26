@@ -614,7 +614,9 @@
     "title": "EduLearn API",
     "description": "API pour la plateforme EduLearn",
     "version": "1.0",
-    "contact": {}
+    "contact": {
+
+    }
   },
   "tags": [],
   "servers": [],

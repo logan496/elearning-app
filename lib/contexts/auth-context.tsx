@@ -24,6 +24,7 @@ interface AuthResponse {
 
 interface AuthContextType {
     user: UserResponseDto | null
+    token: string | null  // ✅ Ajout du token
     isLoading: boolean
     isAuthenticated: boolean
     login: (data: LoginDto) => Promise<void>
@@ -36,6 +37,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<UserResponseDto | null>(null)
+    const [token, setToken] = useState<string | null>(null)  // ✅ État pour le token
     const [isLoading, setIsLoading] = useState(true)
 
     // Initialiser l'authentification au montage
@@ -47,10 +49,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 return
             }
 
-            const token = localStorage.getItem("auth_token")
+            const savedToken = localStorage.getItem("auth_token")
             const savedUser = localStorage.getItem("user")
 
-            if (token && savedUser) {
+            if (savedToken && savedUser) {
                 try {
                     const parsedUser = JSON.parse(savedUser) as UserResponseDto
 
@@ -60,7 +62,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                         parsedUser.username &&
                         parsedUser.email
                     ) {
-                        OpenAPI.TOKEN = token
+                        OpenAPI.TOKEN = savedToken
+                        setToken(savedToken)  // ✅ Sauvegarder le token dans l'état
                         setUser(parsedUser)
                     } else {
                         console.warn("[Auth] Invalid user data in localStorage")
@@ -94,7 +97,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setAuthToken(response.access_token)
             localStorage.setItem("user", JSON.stringify(response.user))
 
-            // Mettre à jour l'état
+            // ✅ Mettre à jour l'état du token
+            setToken(response.access_token)
             setUser(response.user)
 
             toast.success("Connexion réussie !")
@@ -122,7 +126,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setAuthToken(response.access_token)
             localStorage.setItem("user", JSON.stringify(response.user))
 
-            // Mettre à jour l'état
+            // ✅ Mettre à jour l'état du token
+            setToken(response.access_token)
             setUser(response.user)
 
             toast.success("Inscription réussie !")
@@ -141,7 +146,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setAuthToken(null)
         localStorage.removeItem("user")
 
-        // Réinitialiser l'état
+        // ✅ Réinitialiser l'état du token
+        setToken(null)
         setUser(null)
 
         toast.info("Déconnexion réussie")
@@ -165,6 +171,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         <AuthContext.Provider
             value={{
                 user,
+                token,  // ✅ Exposer le token
                 isLoading,
                 isAuthenticated: !!user,
                 login,

@@ -148,7 +148,7 @@ export default function HomePage() {
               </div>
               <div className="relative aspect-video bg-muted rounded-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
                 <video className="w-full h-full object-cover" poster="/modern-online-learning-platform.jpg" controls>
-                  <source src="/demo-video.mp4" type="video/mp4" />
+                  <source src="/1.mp4" type="video/mp4" />
                   Votre navigateur ne supporte pas la lecture de vidéos.
                 </video>
               </div>
