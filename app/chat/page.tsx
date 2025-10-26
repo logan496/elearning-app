@@ -2,7 +2,7 @@
 
 import { Navigation } from "@/components/navigation"
 import { useState, useEffect, useRef } from "react"
-import { Send, Search, Users, MoreVertical, Loader2, MessageSquarePlus } from "lucide-react"
+import { Send, Search, Users, MoreVertical, Loader2, MessageSquarePlus, ArrowLeft, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -61,6 +61,9 @@ export default function ChatPage() {
     const [availableUsers, setAvailableUsers] = useState<OnlineUser[]>([])
     const [isLoadingUsers, setIsLoadingUsers] = useState(false)
     const [userSearchQuery, setUserSearchQuery] = useState("")
+
+    // État pour la sidebar mobile
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
     const {
         isConnected,
@@ -193,22 +196,16 @@ export default function ChatPage() {
         loadMessages()
     }, [selectedConversation?.otherUserId, isAuthenticated, user?.id])
 
-    // ✅ Écouter les messages temps réel avec gestion intelligente
+    // Écouter les messages temps réel
     useEffect(() => {
         if (!selectedConversation || !user) return
 
-        console.log('🎧 Setting up listeners for conversation:', selectedConversation.name, selectedConversation.isGeneral ? 'GENERAL' : `USER ${selectedConversation.otherUserId}`)
-
         if (selectedConversation.isGeneral) {
             const handleGeneralMessage = (message: any) => {
-                console.log('📨 Received general message:', message)
-
                 setMessages((prev) => {
-                    // Si c'est notre message avec tempId, remplacer
                     if (message.tempId) {
                         const index = prev.findIndex(m => m.tempId === message.tempId)
                         if (index !== -1) {
-                            console.log('✅ Replacing temp message with real one')
                             const updated = [...prev]
                             updated[index] = {
                                 ...updated[index],
@@ -220,14 +217,10 @@ export default function ChatPage() {
                         }
                     }
 
-                    // Vérifier si le message existe déjà (éviter duplications)
                     if (prev.some(m => m.id === message.id)) {
-                        console.log('⚠️ Message already exists, skipping')
                         return prev
                     }
 
-                    // Ajouter nouveau message
-                    console.log('➕ Adding new message')
                     const newMessage: Message = {
                         id: message.id,
                         senderId: message.sender.id,
@@ -246,40 +239,23 @@ export default function ChatPage() {
             }
 
             onGeneralMessage(handleGeneralMessage)
-            return () => {
-                console.log('🔇 Cleaning up general message listener')
-                offGeneralMessage()
-            }
+            return () => offGeneralMessage()
         } else {
             const handleDirectMessage = (message: any) => {
-                console.log('📨 Received direct message:', message)
-                console.log('Current conversation otherUserId:', selectedConversation.otherUserId)
-                console.log('Message sender:', message.sender.id, 'recipient:', message.recipient?.id)
-
-                // ✅ Vérifier si le message appartient à cette conversation
                 const isFromOtherUser = message.sender.id === selectedConversation.otherUserId
                 const isToOtherUser = message.recipient?.id === selectedConversation.otherUserId
                 const isMyMessage = message.sender.id === user.id
 
                 const isForThisConversation = (isFromOtherUser && !isMyMessage) || (isMyMessage && isToOtherUser)
 
-                console.log('Is for this conversation?', isForThisConversation, {
-                    isFromOtherUser,
-                    isToOtherUser,
-                    isMyMessage
-                })
-
                 if (!isForThisConversation) {
-                    console.log('❌ Message not for this conversation, ignoring')
                     return
                 }
 
                 setMessages((prev) => {
-                    // ✅ Remplacer message temporaire
                     if (message.tempId) {
                         const index = prev.findIndex(m => m.tempId === message.tempId)
                         if (index !== -1) {
-                            console.log('✅ Replacing temp message with real one')
                             const updated = [...prev]
                             updated[index] = {
                                 ...updated[index],
@@ -291,14 +267,10 @@ export default function ChatPage() {
                         }
                     }
 
-                    // ✅ Éviter duplications
                     if (prev.some(m => m.id === message.id)) {
-                        console.log('⚠️ Message already exists, skipping')
                         return prev
                     }
 
-                    // ✅ Ajouter nouveau message
-                    console.log('➕ Adding new direct message')
                     const newMessage: Message = {
                         id: message.id,
                         senderId: message.sender.id,
@@ -315,7 +287,6 @@ export default function ChatPage() {
                     return [...prev, newMessage]
                 })
 
-                // ✅ Mettre à jour la liste des conversations
                 setConversations(prev => prev.map(conv => {
                     if (conv.otherUserId === selectedConversation.otherUserId) {
                         return {
@@ -332,30 +303,24 @@ export default function ChatPage() {
             }
 
             onDirectMessage(handleDirectMessage)
-            return () => {
-                console.log('🔇 Cleaning up direct message listener')
-                offDirectMessage()
-            }
+            return () => offDirectMessage()
         }
     }, [selectedConversation?.otherUserId, selectedConversation?.isGeneral, user?.id, onGeneralMessage, onDirectMessage, offGeneralMessage, offDirectMessage])
 
-    // ✅ Écouter les messages directs globalement pour créer des conversations
+    // Écouter les messages directs globalement
     useEffect(() => {
         if (!user) return
 
         const handleNewDirectMessage = (message: any) => {
-            // Si ce n'est pas pour la conversation actuelle
             if (selectedConversation?.otherUserId !== message.sender.id &&
                 selectedConversation?.otherUserId !== message.recipient?.id) {
 
-                // Vérifier si une conversation existe déjà
                 const existingConv = conversations.find(c =>
                     c.otherUserId === message.sender.id ||
                     c.otherUserId === message.recipient?.id
                 )
 
                 if (!existingConv && message.sender.id !== user.id) {
-                    // Créer une nouvelle conversation
                     const newConv: Conversation = {
                         id: message.sender.id,
                         name: message.sender.username,
@@ -372,7 +337,6 @@ export default function ChatPage() {
                     setConversations(prev => [...prev, newConv])
                     toast.info(`Nouveau message de ${message.sender.username}`)
                 } else if (existingConv) {
-                    // Mettre à jour la conversation existante
                     setConversations(prev => prev.map(conv => {
                         if (conv.otherUserId === message.sender.id) {
                             return {
@@ -403,7 +367,6 @@ export default function ChatPage() {
 
         try {
             if (selectedConversation?.isGeneral) {
-                // Optimistic update
                 const tempMessage: Message = {
                     id: tempId,
                     senderId: user.id,
@@ -422,7 +385,6 @@ export default function ChatPage() {
                 setMessages((prev) => [...prev, tempMessage])
                 sendGeneralMessage(message, tempId)
             } else if (selectedConversation?.otherUserId) {
-                // Optimistic update
                 const tempMessage: Message = {
                     id: tempId,
                     senderId: user.id,
@@ -441,7 +403,6 @@ export default function ChatPage() {
                 setMessages((prev) => [...prev, tempMessage])
                 sendDirectMessage(selectedConversation.otherUserId, message, tempId)
 
-                // Mettre à jour la conversation
                 setConversations(prev => prev.map(conv => {
                     if (conv.otherUserId === selectedConversation.otherUserId) {
                         return {
@@ -458,7 +419,6 @@ export default function ChatPage() {
         } catch (error) {
             console.error("Erreur envoi message:", error)
             toast.error("Impossible d'envoyer le message")
-            // Supprimer le message temporaire en cas d'erreur
             setMessages(prev => prev.filter(m => m.tempId !== tempId))
         } finally {
             setIsSending(false)
@@ -493,12 +453,12 @@ export default function ChatPage() {
     }
 
     const startNewChat = (selectedUser: OnlineUser) => {
-        // Vérifier si la conversation existe déjà
         const existingConv = conversations.find(c => c.otherUserId === selectedUser.id)
 
         if (existingConv) {
             setSelectedConversation(existingConv)
             setIsNewChatModalOpen(false)
+            setIsSidebarOpen(false)
             toast.info(`Conversation avec ${selectedUser.username} ouverte`)
             return
         }
@@ -518,6 +478,7 @@ export default function ChatPage() {
         setSelectedConversation(newConversation)
         setMessages([])
         setIsNewChatModalOpen(false)
+        setIsSidebarOpen(false)
 
         toast.success(`Chat démarré avec ${selectedUser.username}`)
     }
@@ -550,6 +511,16 @@ export default function ChatPage() {
         toast.success(`Chat démarré avec ${senderName}`)
     }
 
+    const handleSelectConversation = (conv: Conversation) => {
+        setSelectedConversation(conv)
+        setIsSidebarOpen(false)
+        if (conv.unread > 0) {
+            setConversations(prev => prev.map(c =>
+                c.otherUserId === conv.otherUserId ? { ...c, unread: 0 } : c
+            ))
+        }
+    }
+
     const filteredConversations = conversations.filter((conv) =>
         conv.name.toLowerCase().includes(searchQuery.toLowerCase())
     )
@@ -564,7 +535,7 @@ export default function ChatPage() {
             <div className="min-h-screen bg-background">
                 <Navigation />
                 <div className="pt-16 flex items-center justify-center h-[calc(100vh-4rem)]">
-                    <div className="text-center">
+                    <div className="text-center px-4">
                         <h2 className="text-2xl font-bold mb-2">Connexion requise</h2>
                         <p className="text-muted-foreground">Veuillez vous connecter pour accéder au chat</p>
                     </div>
@@ -582,23 +553,51 @@ export default function ChatPage() {
                 </div>
             )}
 
-            <div className="pt-16 h-screen flex">
+            <div className="pt-16 h-screen flex relative">
+                {/* Overlay pour mobile */}
+                {isSidebarOpen && (
+                    <div
+                        className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+                        onClick={() => setIsSidebarOpen(false)}
+                    />
+                )}
+
                 {/* Sidebar conversations */}
-                <div className="w-80 border-r border-border bg-card flex flex-col">
+                <div className={`
+                    ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+                    lg:translate-x-0
+                    fixed lg:relative
+                    w-80 sm:w-96
+                    h-[calc(100vh-4rem)]
+                    border-r border-border bg-card
+                    flex flex-col
+                    transition-transform duration-300 ease-in-out
+                    z-50 lg:z-0
+                `}>
                     <div className="p-4 border-b border-border">
                         <div className="flex items-center justify-between mb-4">
                             <h2 className="text-xl font-bold text-foreground">{t.chat?.title || "Messages"}</h2>
-                            <Button
-                                size="icon"
-                                variant="ghost"
-                                onClick={() => {
-                                    setIsNewChatModalOpen(true)
-                                    loadAvailableUsers()
-                                }}
-                                title="Nouveau chat"
-                            >
-                                <MessageSquarePlus size={20} />
-                            </Button>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    onClick={() => {
+                                        setIsNewChatModalOpen(true)
+                                        loadAvailableUsers()
+                                    }}
+                                    title="Nouveau chat"
+                                >
+                                    <MessageSquarePlus size={20} />
+                                </Button>
+                                <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="lg:hidden"
+                                    onClick={() => setIsSidebarOpen(false)}
+                                >
+                                    <X size={20} />
+                                </Button>
+                            </div>
                         </div>
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
@@ -621,20 +620,12 @@ export default function ChatPage() {
                             filteredConversations.map((conv) => (
                                 <button
                                     key={`conv-${conv.otherUserId || conv.id}`}
-                                    onClick={() => {
-                                        setSelectedConversation(conv)
-                                        // Réinitialiser le compteur non lus
-                                        if (conv.unread > 0) {
-                                            setConversations(prev => prev.map(c =>
-                                                c.otherUserId === conv.otherUserId ? { ...c, unread: 0 } : c
-                                            ))
-                                        }
-                                    }}
+                                    onClick={() => handleSelectConversation(conv)}
                                     className={`w-full p-4 flex items-start gap-3 hover:bg-accent transition-all duration-200 border-b border-border ${
                                         selectedConversation?.otherUserId === conv.otherUserId ? "bg-accent" : ""
                                     }`}
                                 >
-                                    <div className="relative">
+                                    <div className="relative flex-shrink-0">
                                         <img src={conv.avatar} alt={conv.name} className="w-12 h-12 rounded-full" />
                                         {conv.unread > 0 && (
                                             <div className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">
@@ -646,9 +637,9 @@ export default function ChatPage() {
                                         <div className="flex items-center justify-between mb-1">
                                             <h3 className="font-semibold flex items-center gap-2 truncate">
                                                 {conv.name}
-                                                {conv.isGeneral && <Users size={16} className="text-primary" />}
+                                                {conv.isGeneral && <Users size={16} className="text-primary flex-shrink-0" />}
                                             </h3>
-                                            {conv.time && <span className="text-xs text-muted-foreground">{conv.time}</span>}
+                                            {conv.time && <span className="text-xs text-muted-foreground flex-shrink-0">{conv.time}</span>}
                                         </div>
                                         <p className="text-sm text-muted-foreground truncate">{conv.lastMessage || "Aucun message"}</p>
                                     </div>
@@ -659,28 +650,36 @@ export default function ChatPage() {
                 </div>
 
                 {/* Zone de chat */}
-                <div className="flex-1 flex flex-col">
+                <div className="flex-1 flex flex-col w-full lg:w-auto">
                     {selectedConversation ? (
                         <>
-                            <div className="h-16 border-b border-border bg-card px-6 flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <img src={selectedConversation.avatar} alt={selectedConversation.name} className="w-10 h-10 rounded-full" />
-                                    <div>
-                                        <h3 className="font-semibold flex items-center gap-2">
+                            <div className="h-16 border-b border-border bg-card px-4 flex items-center justify-between">
+                                <div className="flex items-center gap-3 min-w-0 flex-1">
+                                    <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        className="lg:hidden flex-shrink-0"
+                                        onClick={() => setIsSidebarOpen(true)}
+                                    >
+                                        <Menu size={20} />
+                                    </Button>
+                                    <img src={selectedConversation.avatar} alt={selectedConversation.name} className="w-10 h-10 rounded-full flex-shrink-0" />
+                                    <div className="min-w-0 flex-1">
+                                        <h3 className="font-semibold flex items-center gap-2 truncate">
                                             {selectedConversation.name}
-                                            {selectedConversation.isGeneral && <Users size={16} className="text-primary" />}
+                                            {selectedConversation.isGeneral && <Users size={16} className="text-primary flex-shrink-0" />}
                                         </h3>
-                                        <p className="text-xs text-muted-foreground">
+                                        <p className="text-xs text-muted-foreground truncate">
                                             {selectedConversation.isGeneral ? "Tous les membres" : "En ligne"}
                                         </p>
                                     </div>
                                 </div>
-                                <Button variant="ghost" size="icon">
+                                <Button variant="ghost" size="icon" className="flex-shrink-0">
                                     <MoreVertical size={20} />
                                 </Button>
                             </div>
 
-                            <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-background">
+                            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 bg-background">
                                 {isLoadingMessages ? (
                                     <div className="flex items-center justify-center h-full">
                                         <Loader2 className="animate-spin" size={32} />
@@ -690,17 +689,17 @@ export default function ChatPage() {
                                         {messages.map((msg) => (
                                             <div
                                                 key={`msg-${msg.id}`}
-                                                className={`flex gap-3 ${msg.isOwn ? "flex-row-reverse" : "flex-row"} ${
+                                                className={`flex gap-2 sm:gap-3 ${msg.isOwn ? "flex-row-reverse" : "flex-row"} ${
                                                     msg.isPending ? "opacity-60" : ""
                                                 }`}
                                             >
                                                 <img
                                                     src={msg.avatar}
                                                     alt={msg.senderName}
-                                                    className="w-8 h-8 rounded-full"
+                                                    className="w-8 h-8 rounded-full flex-shrink-0"
                                                 />
-                                                <div className={`flex flex-col gap-1 max-w-md ${msg.isOwn ? "items-end" : "items-start"}`}>
-                                                    <div className="flex items-center gap-2">
+                                                <div className={`flex flex-col gap-1 max-w-[75%] sm:max-w-md ${msg.isOwn ? "items-end" : "items-start"}`}>
+                                                    <div className="flex items-center gap-2 flex-wrap">
                                                         {selectedConversation.isGeneral && !msg.isOwn ? (
                                                             <button
                                                                 onClick={() => startChatFromGeneral(msg.senderId, msg.senderName, msg.avatar)}
@@ -715,7 +714,7 @@ export default function ChatPage() {
                                                         {msg.isPending && <Loader2 size={12} className="animate-spin" />}
                                                     </div>
                                                     <div
-                                                        className={`px-4 py-2 rounded-2xl ${
+                                                        className={`px-3 sm:px-4 py-2 rounded-2xl break-words ${
                                                             msg.isOwn
                                                                 ? "bg-primary text-primary-foreground rounded-tr-sm"
                                                                 : "bg-card border rounded-tl-sm"
@@ -731,8 +730,8 @@ export default function ChatPage() {
                                 )}
                             </div>
 
-                            <div className="border-t bg-card p-4">
-                                <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} className="flex gap-3">
+                            <div className="border-t bg-card p-3 sm:p-4">
+                                <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} className="flex gap-2 sm:gap-3">
                                     <Input
                                         type="text"
                                         placeholder="Tapez votre message..."
@@ -741,15 +740,24 @@ export default function ChatPage() {
                                         disabled={isSending}
                                         className="flex-1"
                                     />
-                                    <Button type="submit" size="icon" disabled={isSending || !message.trim()}>
+                                    <Button type="submit" size="icon" disabled={isSending || !message.trim()} className="flex-shrink-0">
                                         {isSending ? <Loader2 className="animate-spin" size={20} /> : <Send size={20} />}
                                     </Button>
                                 </form>
                             </div>
                         </>
                     ) : (
-                        <div className="flex-1 flex items-center justify-center text-muted-foreground">
-                            Sélectionnez une conversation
+                        <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-4">
+                            <Button
+                                variant="ghost"
+                                size="lg"
+                                className="lg:hidden mb-4"
+                                onClick={() => setIsSidebarOpen(true)}
+                            >
+                                <Menu className="mr-2" size={20} />
+                                Voir les conversations
+                            </Button>
+                            <p className="text-center">Sélectionnez une conversation pour commencer</p>
                         </div>
                     )}
                 </div>
@@ -757,7 +765,7 @@ export default function ChatPage() {
 
             {/* Modal nouveau chat */}
             <Dialog open={isNewChatModalOpen} onOpenChange={setIsNewChatModalOpen}>
-                <DialogContent className="max-w-md">
+                <DialogContent className="max-w-md mx-4 sm:mx-auto">
                     <DialogHeader>
                         <DialogTitle>Nouveau chat</DialogTitle>
                     </DialogHeader>
@@ -767,7 +775,7 @@ export default function ChatPage() {
                             value={userSearchQuery}
                             onChange={(e) => setUserSearchQuery(e.target.value)}
                         />
-                        <div className="max-h-96 overflow-y-auto space-y-2">
+                        <div className="max-h-[60vh] sm:max-h-96 overflow-y-auto space-y-2">
                             {isLoadingUsers ? (
                                 <div className="flex justify-center py-8">
                                     <Loader2 className="animate-spin" size={24} />
@@ -781,10 +789,10 @@ export default function ChatPage() {
                                         onClick={() => startNewChat(u)}
                                         className="w-full p-3 flex items-center gap-3 hover:bg-accent rounded-lg transition-colors"
                                     >
-                                        <img src={u.avatar} alt={u.username} className="w-10 h-10 rounded-full" />
-                                        <div className="text-left">
-                                            <p className="font-medium">{u.username}</p>
-                                            <p className="text-sm text-muted-foreground">{u.email}</p>
+                                        <img src={u.avatar} alt={u.username} className="w-10 h-10 rounded-full flex-shrink-0" />
+                                        <div className="text-left min-w-0 flex-1">
+                                            <p className="font-medium truncate">{u.username}</p>
+                                            <p className="text-sm text-muted-foreground truncate">{u.email}</p>
                                         </div>
                                     </button>
                                 ))
