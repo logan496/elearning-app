@@ -46,7 +46,7 @@ export function useChatSocket() {
         // ✅ Utiliser l'URL configurée + le namespace /chat
         const socket = io(`${SOCKET_URL}/chat`, {
             auth: { token },
-            transports: ['websocket', 'polling'], // ✅ Fallback sur polling
+            transports: ['websocket', 'polling'],
             reconnection: true,
             reconnectionAttempts: 5,
             reconnectionDelay: 1000,

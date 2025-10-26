@@ -124,10 +124,8 @@ export default function ChatPage() {
                 ]
 
                 setConversations(formattedConversations)
-
-                if (formattedConversations.length > 0) {
-                    setSelectedConversation(formattedConversations[0])
-                }
+                // ✅ NE PLUS AUTO-SÉLECTIONNER
+                // setSelectedConversation(formattedConversations[0])
             } catch (error) {
                 console.error("Erreur chargement conversations:", error)
                 const generalChat: Conversation = {
@@ -140,7 +138,8 @@ export default function ChatPage() {
                     isGeneral: true,
                 }
                 setConversations([generalChat])
-                setSelectedConversation(generalChat)
+                // ✅ NE PLUS AUTO-SÉLECTIONNER
+                // setSelectedConversation(generalChat)
             } finally {
                 setIsLoadingConversations(false)
             }
@@ -149,7 +148,7 @@ export default function ChatPage() {
         loadConversations()
     }, [isAuthenticated])
 
-    // Charger les messages
+    // Charger les messages - ✅ Ajout d'une dépendance selectedConversation.isGeneral
     useEffect(() => {
         if (!isAuthenticated || !selectedConversation) return
 
@@ -194,7 +193,7 @@ export default function ChatPage() {
         }
 
         loadMessages()
-    }, [selectedConversation?.otherUserId, isAuthenticated, user?.id])
+    }, [selectedConversation, isAuthenticated, user?.id]) // ✅ Dépendance complète selectedConversation
 
     // Écouter les messages temps réel
     useEffect(() => {
@@ -492,6 +491,7 @@ export default function ChatPage() {
 
         if (existingConv) {
             setSelectedConversation(existingConv)
+            setIsSidebarOpen(false)
             return
         }
 
@@ -509,6 +509,7 @@ export default function ChatPage() {
         setConversations((prev) => [...prev, newConversation])
         setSelectedConversation(newConversation)
         setMessages([])
+        setIsSidebarOpen(false)
 
         toast.success(`Chat démarré avec ${senderName}`)
     }
@@ -624,7 +625,7 @@ export default function ChatPage() {
                                     key={`conv-${conv.otherUserId || conv.id}`}
                                     onClick={() => handleSelectConversation(conv)}
                                     className={`w-full p-4 flex items-start gap-3 hover:bg-accent transition-all duration-200 border-b border-border ${
-                                        selectedConversation?.otherUserId === conv.otherUserId ? "bg-accent" : ""
+                                        selectedConversation?.otherUserId === conv.otherUserId && selectedConversation?.isGeneral === conv.isGeneral ? "bg-accent" : ""
                                     }`}
                                 >
                                     <div className="relative flex-shrink-0">
@@ -759,7 +760,9 @@ export default function ChatPage() {
                                 <Menu className="mr-2" size={20} />
                                 Voir les conversations
                             </Button>
-                            <p className="text-center">Sélectionnez une conversation pour commencer</p>
+                            <MessageSquarePlus size={48} className="mb-4 opacity-50" />
+                            <p className="text-center text-lg font-medium mb-2">Sélectionnez une conversation</p>
+                            <p className="text-center text-sm">Choisissez un chat pour commencer à discuter</p>
                         </div>
                     )}
                 </div>
