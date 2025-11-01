@@ -124,8 +124,7 @@ export default function ChatPage() {
                 ]
 
                 setConversations(formattedConversations)
-                // ✅ NE PLUS AUTO-SÉLECTIONNER
-                // setSelectedConversation(formattedConversations[0])
+
             } catch (error) {
                 console.error("Erreur chargement conversations:", error)
                 const generalChat: Conversation = {
@@ -138,8 +137,7 @@ export default function ChatPage() {
                     isGeneral: true,
                 }
                 setConversations([generalChat])
-                // ✅ NE PLUS AUTO-SÉLECTIONNER
-                // setSelectedConversation(generalChat)
+
             } finally {
                 setIsLoadingConversations(false)
             }
@@ -148,7 +146,6 @@ export default function ChatPage() {
         loadConversations()
     }, [isAuthenticated])
 
-    // Charger les messages - ✅ Ajout d'une dépendance selectedConversation.isGeneral
     useEffect(() => {
         if (!isAuthenticated || !selectedConversation) return
 
@@ -193,9 +190,8 @@ export default function ChatPage() {
         }
 
         loadMessages()
-    }, [selectedConversation, isAuthenticated, user?.id]) // ✅ Dépendance complète selectedConversation
+    }, [selectedConversation, isAuthenticated, user?.id])
 
-    // Écouter les messages temps réel
     useEffect(() => {
         if (!selectedConversation || !user) return
 

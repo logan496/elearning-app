@@ -1,11 +1,17 @@
 {
   "nav": {
     "home": "Home",
+    "courses": "Courses",
     "podcasts": "Podcasts",
     "team": "Team",
+    "applications": "Applications",
+    "blogs": "Blogs",
     "chat": "Chat",
     "login": "Login",
-    "logout": "Logout"
+    "logout": "Logout",
+    "myApplications": "My Applications",
+    "publisherDashboard": "Publisher Dashboard",
+    "adminDashboard": "Admin Dashboard"
   },
   "home": {
     "hero": {

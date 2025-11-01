@@ -1,11 +1,17 @@
 {
   "nav": {
     "home": "Accueil",
+    "courses": "Cours",
     "podcasts": "Podcasts",
     "team": "Équipe",
+    "applications": "Postuler",
+    "blogs": "Blogs",
     "chat": "Chat",
     "login": "Connexion",
-    "logout": "Déconnexion"
+    "logout": "Déconnexion",
+    "myApplications": "Mes Candidatures",
+    "publisherDashboard": "Tableau de bord",
+    "adminDashboard": "Admin"
   },
   "home": {
     "hero": {
