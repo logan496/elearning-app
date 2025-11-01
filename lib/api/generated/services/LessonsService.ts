@@ -47,6 +47,17 @@ export class LessonsService {
         });
     }
     /**
+     * Obtenir toutes les leçons
+     * @returns LessonResponseDto Liste des leçons disponibles
+     * @throws ApiError
+     */
+    public static lessonsControllerGetAllPublishedLessons(): CancelablePromise<Array<LessonResponseDto>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/lessons/published',
+        });
+    }
+    /**
      * Obtenir une leçon par ID
      * @param id ID de la leçon
      * @param userId
