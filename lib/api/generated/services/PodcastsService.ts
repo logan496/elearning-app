@@ -2,66 +2,154 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { CreatePodcastDto } from '../models/CreatePodcastDto';
-import type { PodcastResponseDto } from '../models/PodcastResponseDto';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 export class PodcastsService {
     /**
-     * Créer un nouveau podcast (publishers uniquement)
-     * @param requestBody
-     * @returns PodcastResponseDto Podcast créé
+     * Obtenir tous les podcasts publiés
+     * @param page
+     * @param limit
+     * @param type audio ou video
+     * @param category
+     * @returns any
      * @throws ApiError
      */
-    public static podcastControllerCreatePodcast(
-        requestBody: CreatePodcastDto,
-    ): CancelablePromise<PodcastResponseDto> {
+    public static podcastControllerGetAllPodcasts(
+        page?: number,
+        limit?: number,
+        type?: string,
+        category?: string,
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
-            method: 'POST',
+            method: 'GET',
             url: '/api/podcasts',
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                403: `Vous ne pouvez pas publier de podcasts`,
+            query: {
+                'page': page,
+                'limit': limit,
+                'type': type,
+                'category': category,
             },
         });
     }
     /**
-     * Récupérer tous les podcasts
-     * @returns PodcastResponseDto Liste des podcasts
+     * Créer un podcast avec upload de fichiers
+     * @param formData
+     * @returns any
      * @throws ApiError
      */
-    public static podcastControllerGetAllPodcasts(): CancelablePromise<Array<PodcastResponseDto>> {
+    public static podcastControllerCreatePodcast(
+        formData: {
+            title: string;
+            description: string;
+            type: 'audio' | 'video';
+            duration: number;
+            category?: string;
+            /**
+             * Séparés par des virgules
+             */
+            tags?: string;
+            autoShareOnPublish?: boolean;
+            /**
+             * Fichier audio (max 20MB) ou vidéo (max 50MB)
+             */
+            mediaFile: Blob;
+            /**
+             * Image miniature (optionnel, max 5MB)
+             */
+            thumbnailFile?: Blob;
+        },
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
-            method: 'GET',
+            method: 'POST',
             url: '/api/podcasts',
+            formData: formData,
+            mediaType: 'multipart/form-data',
         });
     }
     /**
-     * Récupérer un podcast par son ID
-     * @param id ID du podcast
-     * @returns PodcastResponseDto Détails du podcast
+     * Rechercher des podcasts
+     * @param q
+     * @returns any
+     * @throws ApiError
+     */
+    public static podcastControllerSearchPodcasts(
+        q: string,
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/podcasts/search',
+            query: {
+                'q': q,
+            },
+        });
+    }
+    /**
+     * Obtenir mes podcasts
+     * @returns any
+     * @throws ApiError
+     */
+    public static podcastControllerGetMyPodcasts(): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/podcasts/my-podcasts',
+        });
+    }
+    /**
+     * Obtenir un podcast par ID
+     * @param id
+     * @returns any
      * @throws ApiError
      */
     public static podcastControllerGetPodcastById(
         id: number,
-    ): CancelablePromise<PodcastResponseDto> {
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/podcasts/{id}',
             path: {
                 'id': id,
             },
-            errors: {
-                404: `Podcast non trouvé`,
+        });
+    }
+    /**
+     * Mettre à jour un podcast
+     * @param id
+     * @param formData
+     * @returns any
+     * @throws ApiError
+     */
+    public static podcastControllerUpdatePodcast(
+        id: number,
+        formData: {
+            title?: string;
+            description?: string;
+            type?: 'audio' | 'video';
+            duration?: number;
+            category?: string;
+            /**
+             * Séparés par des virgules
+             */
+            tags?: string;
+            autoShareOnPublish?: boolean;
+            mediaFile?: Blob;
+            thumbnailFile?: Blob;
+        },
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/api/podcasts/{id}',
+            path: {
+                'id': id,
             },
+            formData: formData,
+            mediaType: 'multipart/form-data',
         });
     }
     /**
      * Supprimer un podcast
-     * @param id ID du podcast
-     * @returns any Podcast supprimé
+     * @param id
+     * @returns any
      * @throws ApiError
      */
     public static podcastControllerDeletePodcast(
@@ -73,26 +161,39 @@ export class PodcastsService {
             path: {
                 'id': id,
             },
-            errors: {
-                403: `Vous ne pouvez pas supprimer ce podcast`,
-                404: `Podcast non trouvé`,
+        });
+    }
+    /**
+     * Publier un podcast
+     * @param id
+     * @returns any
+     * @throws ApiError
+     */
+    public static podcastControllerPublishPodcast(
+        id: number,
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/podcasts/{id}/publish',
+            path: {
+                'id': id,
             },
         });
     }
     /**
-     * Récupérer les podcasts d'un publisher
-     * @param publisherId ID du publisher
-     * @returns PodcastResponseDto Liste des podcasts du publisher
+     * Liker/Unliker un podcast
+     * @param id
+     * @returns any
      * @throws ApiError
      */
-    public static podcastControllerGetPodcastsByPublisher(
-        publisherId: number,
-    ): CancelablePromise<Array<PodcastResponseDto>> {
+    public static podcastControllerToggleLike(
+        id: number,
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/podcasts/publisher/{publisherId}',
+            method: 'POST',
+            url: '/api/podcasts/{id}/like',
             path: {
-                'publisherId': publisherId,
+                'id': id,
             },
         });
     }

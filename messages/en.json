@@ -11,7 +11,8 @@
     "logout": "Logout",
     "myApplications": "My Applications",
     "publisherDashboard": "Publisher Dashboard",
-    "adminDashboard": "Admin Dashboard"
+    "adminDashboard": "Admin Dashboard",
+    "profile": "Profile"
   },
   "home": {
     "hero": {
@@ -78,7 +79,15 @@
     "subtitle": "Discover inspiring conversations with industry experts",
     "featured": "Featured",
     "allPodcasts": "All Podcasts",
-    "duration": "min"
+    "duration": "min",
+    "myPodcasts": "My Podcasts",
+    "newPodcast": "New Podcast",
+    "editPodcast": "Edit Podcast",
+    "noPodcasts": "No podcasts yet",
+    "createFirst": "Create your first podcast",
+    "share": "Share",
+    "shareOn": "Share on",
+    "selectPlatforms": "Select platforms to share on"
   },
   "team": {
     "title": "Our Team",
@@ -127,5 +136,18 @@
         "description": "Access quality content and join our community"
       }
     }
+  },
+  "profile": {
+    "title": "My Profile",
+    "subtitle": "Manage your personal information and connected accounts",
+    "personalInfo": "Personal Information",
+    "username": "Username",
+    "email": "Email",
+    "roles": "Roles",
+    "save": "Save",
+    "socialAccounts": "Social Media Accounts",
+    "connectedAccounts": "Connected Accounts",
+    "connectAccount": "Connect Account",
+    "disconnect": "Disconnect"
   }
 }

@@ -1,31 +1,25 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import {
-  Menu,
-  X,
-  LogOut,
-  LayoutDashboard,
-  Shield,
-  ChevronDown,
-} from "lucide-react";
-import { useState } from "react";
-import { useI18n } from "@/lib/i18n-context";
-import { LanguageSwitcher } from "./language-switcher";
-import { useAuth } from "@/lib/contexts/auth-context";
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { Menu, X, LogOut, LayoutDashboard, Shield, ChevronDown, User } from "lucide-react"
+import { useState } from "react"
+import { useI18n } from "@/lib/i18n-context"
+import { LanguageSwitcher } from "./language-switcher"
+import { useAuth } from "@/lib/contexts/auth-context"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu"
 
 export function Navigation() {
-  const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(false);
-  const { t } = useI18n();
-  const { isAuthenticated, user, logout } = useAuth();
+  const pathname = usePathname()
+  const [isOpen, setIsOpen] = useState(false)
+  const { t } = useI18n()
+  const { isAuthenticated, user, logout } = useAuth()
 
   const links = [
     { href: "/", label: t.nav.home },
@@ -35,32 +29,29 @@ export function Navigation() {
     { href: "/equipe", label: t.nav.team },
     ...(isAuthenticated
       ? [
-          { href: "/applications", label: t.nav.applications },
-          {
-            href: "/applications/my-applications",
-            label: t.nav.myApplications,
-          },
-        ]
+        { href: "/applications", label: t.nav.applications },
+        {
+          href: "/applications/my-applications",
+          label: t.nav.myApplications,
+        },
+      ]
       : []),
     { href: "/chat", label: t.nav.chat },
     ...(!isAuthenticated ? [{ href: "/login", label: t.nav.login }] : []),
-  ];
+  ]
 
   const adminMenuItems = [
     { href: "/admin", label: "Dashboard" },
     { href: "/admin/users", label: "Utilisateurs" },
     { href: "/admin/applications", label: "Candidatures" },
     { href: "/admin/jobs/new", label: "Créer une offre" },
-  ];
+  ]
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-b border-border transition-all duration-300">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <Link
-            href="/"
-            className="text-2xl font-bold text-primary hover:scale-105 transition-transform duration-200"
-          >
+          <Link href="/" className="text-2xl font-bold text-primary hover:scale-105 transition-transform duration-200">
             EduLearn
           </Link>
 
@@ -103,9 +94,7 @@ export function Navigation() {
               <Link
                 href="/publisher"
                 className={`flex items-center gap-2 text-sm font-medium transition-all duration-200 hover:text-primary hover:scale-105 relative group ${
-                  pathname.startsWith("/publisher")
-                    ? "text-primary"
-                    : "text-foreground"
+                  pathname.startsWith("/publisher") ? "text-primary" : "text-foreground"
                 }`}
               >
                 <LayoutDashboard size={18} />
@@ -114,16 +103,26 @@ export function Navigation() {
               </Link>
             )}
             {isAuthenticated && (
-              <button
-                onClick={logout}
-                className="flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary transition-all duration-200 hover:scale-105 group"
-              >
-                <LogOut
-                  size={18}
-                  className="transition-transform duration-200 group-hover:translate-x-1"
-                />
-                {t.nav.logout}
-              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium transition-all duration-200 hover:text-primary hover:scale-105 outline-none">
+                  <User size={18} />
+                  {user?.username}
+                  <ChevronDown size={16} />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem asChild>
+                    <Link href="/profile" className="w-full cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      Mon profil
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout} className="cursor-pointer">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    {t.nav.logout}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
             <LanguageSwitcher />
           </div>
@@ -134,9 +133,7 @@ export function Navigation() {
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
           >
-            <div
-              className={`transition-transform duration-300 ${isOpen ? "rotate-90" : "rotate-0"}`}
-            >
+            <div className={`transition-transform duration-300 ${isOpen ? "rotate-90" : "rotate-0"}`}>
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </div>
           </button>
@@ -152,9 +149,7 @@ export function Navigation() {
                   href={link.href}
                   onClick={() => setIsOpen(false)}
                   className={`text-sm font-medium transition-all duration-200 hover:text-primary hover:bg-accent px-4 py-2 rounded-lg ${
-                    pathname === link.href
-                      ? "text-primary bg-accent"
-                      : "text-foreground"
+                    pathname === link.href ? "text-primary bg-accent" : "text-foreground"
                   }`}
                 >
                   {link.label}
@@ -162,18 +157,14 @@ export function Navigation() {
               ))}
               {isAuthenticated && user?.isAdmin && (
                 <>
-                  <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase">
-                    Admin
-                  </div>
+                  <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase">Admin</div>
                   {adminMenuItems.map((item) => (
                     <Link
                       key={item.href}
                       href={item.href}
                       onClick={() => setIsOpen(false)}
                       className={`text-sm font-medium transition-all duration-200 hover:text-primary hover:bg-accent px-4 py-2 rounded-lg ${
-                        pathname === item.href
-                          ? "text-primary bg-accent"
-                          : "text-foreground"
+                        pathname === item.href ? "text-primary bg-accent" : "text-foreground"
                       }`}
                     >
                       {item.label}
@@ -186,9 +177,7 @@ export function Navigation() {
                   href="/publisher"
                   onClick={() => setIsOpen(false)}
                   className={`flex items-center gap-2 text-sm font-medium transition-all duration-200 hover:text-primary hover:bg-accent px-4 py-2 rounded-lg ${
-                    pathname.startsWith("/publisher")
-                      ? "text-primary bg-accent"
-                      : "text-foreground"
+                    pathname.startsWith("/publisher") ? "text-primary bg-accent" : "text-foreground"
                   }`}
                 >
                   <LayoutDashboard size={18} />
@@ -196,16 +185,26 @@ export function Navigation() {
                 </Link>
               )}
               {isAuthenticated && (
-                <button
-                  onClick={() => {
-                    logout();
-                    setIsOpen(false);
-                  }}
-                  className="flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary hover:bg-accent px-4 py-2 rounded-lg transition-all duration-200"
-                >
-                  <LogOut size={18} />
-                  {t.nav.logout}
-                </button>
+                <>
+                  <Link
+                    href="/profile"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-2 text-sm font-medium transition-all duration-200 hover:text-primary hover:bg-accent px-4 py-2 rounded-lg"
+                  >
+                    <User size={18} />
+                    Mon profil
+                  </Link>
+                  <button
+                    onClick={() => {
+                      logout()
+                      setIsOpen(false)
+                    }}
+                    className="flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary hover:bg-accent px-4 py-2 rounded-lg transition-all duration-200"
+                  >
+                    <LogOut size={18} />
+                    {t.nav.logout}
+                  </button>
+                </>
               )}
               <div className="px-4 py-2">
                 <LanguageSwitcher />
@@ -215,5 +214,5 @@ export function Navigation() {
         )}
       </div>
     </nav>
-  );
+  )
 }

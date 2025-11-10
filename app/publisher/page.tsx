@@ -1,81 +1,75 @@
-"use client";
+"use client"
 
-import { Navigation } from "@/components/navigation";
-import { Footer } from "@/components/footer";
-import { useState, useEffect } from "react";
-import { useAuth } from "@/lib/contexts/auth-context";
-import {
-  BlogService,
-  LessonsService,
-  JobApplicationsService,
-} from "@/lib/api/generated";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import { BookOpen, FileText, Users, TrendingUp, Plus, Eye } from "lucide-react";
-import Link from "next/link";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Navigation } from "@/components/navigation"
+import { Footer } from "@/components/footer"
+import { useState, useEffect } from "react"
+import { useAuth } from "@/lib/contexts/auth-context"
+import { BlogService, LessonsService, JobApplicationsService, PodcastsService } from "@/lib/api/generated"
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
+import { BookOpen, FileText, TrendingUp, Plus, Eye, Mic } from "lucide-react"
+import Link from "next/link"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 interface DashboardStats {
-  totalCourses: number;
-  totalPosts: number;
-  totalEnrollments: number;
-  totalApplications: number;
-  recentCourses: any[];
-  recentPosts: any[];
+  totalCourses: number
+  totalPosts: number
+  totalEnrollments: number
+  totalApplications: number
+  totalPodcasts: number
+  recentCourses: any[]
+  recentPosts: any[]
+  recentPodcasts: any[]
 }
 
 export default function PublisherDashboard() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth()
   const [stats, setStats] = useState<DashboardStats>({
     totalCourses: 0,
     totalPosts: 0,
     totalEnrollments: 0,
     totalApplications: 0,
+    totalPodcasts: 0,
     recentCourses: [],
     recentPosts: [],
-  });
-  const [loading, setLoading] = useState(true);
-  const [allCourses, setAllCourses] = useState<any[]>([]);
-  const [loadingAllCourses, setLoadingAllCourses] = useState(false);
+    recentPodcasts: [],
+  })
+  const [loading, setLoading] = useState(true)
+  const [allCourses, setAllCourses] = useState<any[]>([])
+  const [loadingAllCourses, setLoadingAllCourses] = useState(false)
 
   useEffect(() => {
     if (isAuthenticated && user?.isPublisher) {
-      loadDashboardData();
+      loadDashboardData()
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user])
 
   const loadDashboardData = async () => {
     try {
-      setLoading(true);
+      setLoading(true)
 
-      const courses = await LessonsService.lessonsControllerGetMyLessons();
-      const totalEnrollments = courses.reduce(
-        (sum: number, course: any) => sum + (course.enrollmentCount || 0),
-        0,
-      );
+      const courses = await LessonsService.lessonsControllerGetMyLessons()
+      const totalEnrollments = courses.reduce((sum: number, course: any) => sum + (course.enrollmentCount || 0), 0)
 
-      const posts = await BlogService.blogControllerGetMyPosts();
+      const posts = await BlogService.blogControllerGetMyPosts()
 
-      let totalApplications = 0;
+      let podcasts: any[] = []
       try {
-        const jobs =
-          await JobApplicationsService.applicationsControllerGetMyJobPostings();
+        podcasts = await PodcastsService.podcastControllerGetMyPodcasts()
+      } catch (error) {
+        console.log("[Dashboard] No podcasts yet")
+      }
+
+      let totalApplications = 0
+      try {
+        const jobs = await JobApplicationsService.applicationsControllerGetMyJobPostings()
         for (const job of jobs as any[]) {
-          const jobApps =
-            await JobApplicationsService.applicationsControllerGetJobApplications(
-              job.id,
-            );
-          totalApplications += jobApps.length;
+          const jobApps = await JobApplicationsService.applicationsControllerGetJobApplications(job.id)
+          totalApplications += jobApps.length
         }
       } catch (error) {
-        console.log("[Dashboard] No job postings yet");
+        console.log("[Dashboard] No job postings yet")
       }
 
       setStats({
@@ -83,33 +77,33 @@ export default function PublisherDashboard() {
         totalPosts: posts.length,
         totalEnrollments,
         totalApplications,
+        totalPodcasts: podcasts.length,
         recentCourses: courses.slice(0, 3),
         recentPosts: posts.slice(0, 3),
-      });
+        recentPodcasts: podcasts.slice(0, 3),
+      })
     } catch (error) {
-      console.error("[Dashboard] Error loading data:", error);
-      toast.error("Erreur lors du chargement du tableau de bord");
+      console.error("[Dashboard] Error loading data:", error)
+      toast.error("Erreur lors du chargement du tableau de bord")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const loadAllCourses = async () => {
-    if (allCourses.length > 0) return; // Already loaded
+    if (allCourses.length > 0) return // Already loaded
 
     try {
-      setLoadingAllCourses(true);
-      const courses = await LessonsService.lessonsControllerGetAllLessons(
-        user?.id || 0,
-      );
-      setAllCourses(courses);
+      setLoadingAllCourses(true)
+      const courses = await LessonsService.lessonsControllerGetAllLessons(user?.id || 0)
+      setAllCourses(courses)
     } catch (error) {
-      console.error("[Dashboard] Error loading all courses:", error);
-      toast.error("Erreur lors du chargement des cours");
+      console.error("[Dashboard] Error loading all courses:", error)
+      toast.error("Erreur lors du chargement des cours")
     } finally {
-      setLoadingAllCourses(false);
+      setLoadingAllCourses(false)
     }
-  };
+  }
 
   if (!isAuthenticated) {
     return (
@@ -118,16 +112,14 @@ export default function PublisherDashboard() {
         <div className="pt-16 flex items-center justify-center h-[calc(100vh-4rem)]">
           <div className="text-center px-4">
             <h2 className="text-2xl font-bold mb-2">Connexion requise</h2>
-            <p className="text-muted-foreground mb-4">
-              Veuillez vous connecter pour accéder au tableau de bord
-            </p>
+            <p className="text-muted-foreground mb-4">Veuillez vous connecter pour accéder au tableau de bord</p>
             <Button asChild>
               <Link href="/login">Se connecter</Link>
             </Button>
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   if (!user?.isPublisher) {
@@ -137,16 +129,14 @@ export default function PublisherDashboard() {
         <div className="pt-16 flex items-center justify-center h-[calc(100vh-4rem)]">
           <div className="text-center px-4">
             <h2 className="text-2xl font-bold mb-2">Accès refusé</h2>
-            <p className="text-muted-foreground mb-4">
-              Vous devez être un éditeur pour accéder à cette page
-            </p>
+            <p className="text-muted-foreground mb-4">Vous devez être un éditeur pour accéder à cette page</p>
             <Button asChild>
               <Link href="/applications">Postuler pour devenir éditeur</Link>
             </Button>
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -159,8 +149,7 @@ export default function PublisherDashboard() {
           <div className="mb-12">
             <h1 className="text-4xl font-bold mb-2">Tableau de bord Éditeur</h1>
             <p className="text-muted-foreground">
-              Bienvenue, {user?.username}! Gérez vos contenus et suivez vos
-              statistiques.
+              Bienvenue, {user?.username}! Gérez vos contenus et suivez vos statistiques.
             </p>
           </div>
 
@@ -182,23 +171,17 @@ export default function PublisherDashboard() {
                 <Card>
                   <CardHeader>
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-sm font-medium text-muted-foreground">
-                        Cours
-                      </CardTitle>
+                      <CardTitle className="text-sm font-medium text-muted-foreground">Cours</CardTitle>
                       <BookOpen className="w-4 h-4 text-muted-foreground" />
                     </div>
-                    <div className="text-3xl font-bold">
-                      {stats.totalCourses}
-                    </div>
+                    <div className="text-3xl font-bold">{stats.totalCourses}</div>
                   </CardHeader>
                 </Card>
 
                 <Card>
                   <CardHeader>
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-sm font-medium text-muted-foreground">
-                        Articles
-                      </CardTitle>
+                      <CardTitle className="text-sm font-medium text-muted-foreground">Articles</CardTitle>
                       <FileText className="w-4 h-4 text-muted-foreground" />
                     </div>
                     <div className="text-3xl font-bold">{stats.totalPosts}</div>
@@ -208,28 +191,20 @@ export default function PublisherDashboard() {
                 <Card>
                   <CardHeader>
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-sm font-medium text-muted-foreground">
-                        Inscriptions
-                      </CardTitle>
-                      <TrendingUp className="w-4 h-4 text-muted-foreground" />
+                      <CardTitle className="text-sm font-medium text-muted-foreground">Podcasts</CardTitle>
+                      <Mic className="w-4 h-4 text-muted-foreground" />
                     </div>
-                    <div className="text-3xl font-bold">
-                      {stats.totalEnrollments}
-                    </div>
+                    <div className="text-3xl font-bold">{stats.totalPodcasts}</div>
                   </CardHeader>
                 </Card>
 
                 <Card>
                   <CardHeader>
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-sm font-medium text-muted-foreground">
-                        Candidatures
-                      </CardTitle>
-                      <Users className="w-4 h-4 text-muted-foreground" />
+                      <CardTitle className="text-sm font-medium text-muted-foreground">Inscriptions</CardTitle>
+                      <TrendingUp className="w-4 h-4 text-muted-foreground" />
                     </div>
-                    <div className="text-3xl font-bold">
-                      {stats.totalApplications}
-                    </div>
+                    <div className="text-3xl font-bold">{stats.totalEnrollments}</div>
                   </CardHeader>
                 </Card>
               </div>
@@ -237,42 +212,27 @@ export default function PublisherDashboard() {
               {/* Quick Actions */}
               <div className="mb-12">
                 <h2 className="text-2xl font-bold mb-6">Actions rapides</h2>
-                <div className="grid md:grid-cols-3 gap-4">
-                  <Button
-                    asChild
-                    variant="outline"
-                    className="h-auto py-6 bg-transparent"
-                  >
-                    <Link
-                      href="/publisher/courses/new"
-                      className="flex flex-col items-center gap-2"
-                    >
+                <div className="grid md:grid-cols-4 gap-4">
+                  <Button asChild variant="outline" className="h-auto py-6 bg-transparent">
+                    <Link href="/publisher/courses/new" className="flex flex-col items-center gap-2">
                       <Plus className="w-6 h-6" />
                       <span>Nouveau cours</span>
                     </Link>
                   </Button>
-                  <Button
-                    asChild
-                    variant="outline"
-                    className="h-auto py-6 bg-transparent"
-                  >
-                    <Link
-                      href="/publisher/blog/new"
-                      className="flex flex-col items-center gap-2"
-                    >
+                  <Button asChild variant="outline" className="h-auto py-6 bg-transparent">
+                    <Link href="/publisher/blog/new" className="flex flex-col items-center gap-2">
                       <Plus className="w-6 h-6" />
                       <span>Nouvel article</span>
                     </Link>
                   </Button>
-                  <Button
-                    asChild
-                    variant="outline"
-                    className="h-auto py-6 bg-transparent"
-                  >
-                    <Link
-                      href="/publisher/applications"
-                      className="flex flex-col items-center gap-2"
-                    >
+                  <Button asChild variant="outline" className="h-auto py-6 bg-transparent">
+                    <Link href="/publisher/podcasts/new" className="flex flex-col items-center gap-2">
+                      <Plus className="w-6 h-6" />
+                      <span>Nouveau podcast</span>
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" className="h-auto py-6 bg-transparent">
+                    <Link href="/publisher/applications" className="flex flex-col items-center gap-2">
                       <Eye className="w-6 h-6" />
                       <span>Voir les candidatures</span>
                     </Link>
@@ -295,9 +255,7 @@ export default function PublisherDashboard() {
 
                     <TabsContent value="my-courses">
                       <div className="flex items-center justify-between mb-4">
-                        <p className="text-sm text-muted-foreground">
-                          Cours que vous avez créés
-                        </p>
+                        <p className="text-sm text-muted-foreground">Cours que vous avez créés</p>
                         <Button asChild variant="ghost" size="sm">
                           <Link href="/publisher/courses">Voir tout</Link>
                         </Button>
@@ -306,9 +264,7 @@ export default function PublisherDashboard() {
                         <Card>
                           <CardContent className="py-12 text-center">
                             <BookOpen className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                            <p className="text-muted-foreground">
-                              Aucun cours pour le moment
-                            </p>
+                            <p className="text-muted-foreground">Aucun cours pour le moment</p>
                           </CardContent>
                         </Card>
                       ) : (
@@ -316,24 +272,14 @@ export default function PublisherDashboard() {
                           {stats.recentCourses.map((course: any) => (
                             <Card key={course.id}>
                               <CardHeader>
-                                <CardTitle className="text-lg">
-                                  {course.title}
-                                </CardTitle>
-                                <CardDescription className="line-clamp-2">
-                                  {course.description}
-                                </CardDescription>
+                                <CardTitle className="text-lg">{course.title}</CardTitle>
+                                <CardDescription className="line-clamp-2">{course.description}</CardDescription>
                               </CardHeader>
                               <CardContent>
                                 <div className="flex items-center justify-between text-sm">
-                                  <span className="text-muted-foreground">
-                                    {course.enrollmentCount || 0} inscrits
-                                  </span>
+                                  <span className="text-muted-foreground">{course.enrollmentCount || 0} inscrits</span>
                                   <Button asChild size="sm" variant="ghost">
-                                    <Link
-                                      href={`/publisher/courses/${course.id}/edit`}
-                                    >
-                                      Modifier
-                                    </Link>
+                                    <Link href={`/publisher/courses/${course.id}/edit`}>Modifier</Link>
                                   </Button>
                                 </div>
                               </CardContent>
@@ -344,9 +290,7 @@ export default function PublisherDashboard() {
                     </TabsContent>
 
                     <TabsContent value="all-courses">
-                      <p className="text-sm text-muted-foreground mb-4">
-                        Tous les cours publiés sur la plateforme
-                      </p>
+                      <p className="text-sm text-muted-foreground mb-4">Tous les cours publiés sur la plateforme</p>
                       {loadingAllCourses ? (
                         <div className="space-y-4">
                           {[1, 2, 3].map((i) => (
@@ -362,9 +306,7 @@ export default function PublisherDashboard() {
                         <Card>
                           <CardContent className="py-12 text-center">
                             <BookOpen className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                            <p className="text-muted-foreground">
-                              Aucun cours disponible
-                            </p>
+                            <p className="text-muted-foreground">Aucun cours disponible</p>
                           </CardContent>
                         </Card>
                       ) : (
@@ -374,12 +316,8 @@ export default function PublisherDashboard() {
                               <CardHeader>
                                 <div className="flex items-start justify-between">
                                   <div className="flex-1">
-                                    <CardTitle className="text-lg">
-                                      {course.title}
-                                    </CardTitle>
-                                    <CardDescription className="line-clamp-2">
-                                      {course.description}
-                                    </CardDescription>
+                                    <CardTitle className="text-lg">{course.title}</CardTitle>
+                                    <CardDescription className="line-clamp-2">{course.description}</CardDescription>
                                   </div>
                                   {course.instructorId === user?.id && (
                                     <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full ml-2">
@@ -395,15 +333,11 @@ export default function PublisherDashboard() {
                                       {course.enrollmentCount || 0} inscrits
                                     </span>
                                     {course.instructor && (
-                                      <span className="text-muted-foreground">
-                                        Par {course.instructor.username}
-                                      </span>
+                                      <span className="text-muted-foreground">Par {course.instructor.username}</span>
                                     )}
                                   </div>
                                   <Button asChild size="sm" variant="ghost">
-                                    <Link href={`/courses/${course.id}`}>
-                                      Voir
-                                    </Link>
+                                    <Link href={`/courses/${course.id}`}>Voir</Link>
                                   </Button>
                                 </div>
                               </CardContent>
@@ -427,9 +361,7 @@ export default function PublisherDashboard() {
                     <Card>
                       <CardContent className="py-12 text-center">
                         <FileText className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                        <p className="text-muted-foreground">
-                          Aucun article pour le moment
-                        </p>
+                        <p className="text-muted-foreground">Aucun article pour le moment</p>
                       </CardContent>
                     </Card>
                   ) : (
@@ -437,24 +369,16 @@ export default function PublisherDashboard() {
                       {stats.recentPosts.map((post: any) => (
                         <Card key={post.id}>
                           <CardHeader>
-                            <CardTitle className="text-lg">
-                              {post.title}
-                            </CardTitle>
-                            <CardDescription className="line-clamp-2">
-                              {post.excerpt}
-                            </CardDescription>
+                            <CardTitle className="text-lg">{post.title}</CardTitle>
+                            <CardDescription className="line-clamp-2">{post.excerpt}</CardDescription>
                           </CardHeader>
                           <CardContent>
                             <div className="flex items-center justify-between text-sm">
                               <span className="text-muted-foreground">
-                                {new Date(post.createdAt).toLocaleDateString(
-                                  "fr-FR",
-                                )}
+                                {new Date(post.createdAt).toLocaleDateString("fr-FR")}
                               </span>
                               <Button asChild size="sm" variant="ghost">
-                                <Link href={`/publisher/blog/${post.id}/edit`}>
-                                  Modifier
-                                </Link>
+                                <Link href={`/publisher/blog/${post.id}/edit`}>Modifier</Link>
                               </Button>
                             </div>
                           </CardContent>
@@ -464,6 +388,42 @@ export default function PublisherDashboard() {
                   )}
                 </div>
               </div>
+
+              <div className="mt-8">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold">Podcasts récents</h2>
+                  <Button asChild variant="ghost" size="sm">
+                    <Link href="/publisher/podcasts">Voir tout</Link>
+                  </Button>
+                </div>
+                {stats.recentPodcasts.length === 0 ? (
+                  <Card>
+                    <CardContent className="py-12 text-center">
+                      <Mic className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                      <p className="text-muted-foreground">Aucun podcast pour le moment</p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="grid md:grid-cols-3 gap-4">
+                    {stats.recentPodcasts.map((podcast: any) => (
+                      <Card key={podcast.id}>
+                        <CardHeader>
+                          <CardTitle className="text-lg">{podcast.title}</CardTitle>
+                          <CardDescription className="line-clamp-2">{podcast.description}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">{podcast.duration} min</span>
+                            <Button asChild size="sm" variant="ghost">
+                              <Link href={`/publisher/podcasts/${podcast.id}/edit`}>Modifier</Link>
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </div>
             </>
           )}
         </div>
@@ -471,5 +431,5 @@ export default function PublisherDashboard() {
 
       <Footer />
     </div>
-  );
+  )
 }

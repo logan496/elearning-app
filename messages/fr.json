@@ -11,7 +11,8 @@
     "logout": "Déconnexion",
     "myApplications": "Mes Candidatures",
     "publisherDashboard": "Tableau de bord",
-    "adminDashboard": "Admin"
+    "adminDashboard": "Admin",
+    "profile": "Profil"
   },
   "home": {
     "hero": {
@@ -78,7 +79,15 @@
     "subtitle": "Découvrez des conversations inspirantes avec des experts du secteur",
     "featured": "À la une",
     "allPodcasts": "Tous les Podcasts",
-    "duration": "min"
+    "duration": "min",
+    "myPodcasts": "Mes Podcasts",
+    "newPodcast": "Nouveau Podcast",
+    "editPodcast": "Modifier le Podcast",
+    "noPodcasts": "Aucun podcast pour le moment",
+    "createFirst": "Créer votre premier podcast",
+    "share": "Partager",
+    "shareOn": "Partager sur",
+    "selectPlatforms": "Sélectionnez les plateformes sur lesquelles partager"
   },
   "team": {
     "title": "Notre Équipe",
@@ -127,5 +136,18 @@
         "description": "Accédez à du contenu de qualité et rejoignez notre communauté"
       }
     }
+  },
+  "profile": {
+    "title": "Mon Profil",
+    "subtitle": "Gérez vos informations personnelles et vos comptes connectés",
+    "personalInfo": "Informations personnelles",
+    "username": "Nom d'utilisateur",
+    "email": "Email",
+    "roles": "Rôles",
+    "save": "Enregistrer",
+    "socialAccounts": "Comptes de réseaux sociaux",
+    "connectedAccounts": "Comptes connectés",
+    "connectAccount": "Connecter un compte",
+    "disconnect": "Déconnecter"
   }
 }

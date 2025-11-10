@@ -4,7 +4,7 @@
 /* eslint-disable */
 import axios from 'axios';
 import type { AxiosError, AxiosRequestConfig, AxiosResponse, AxiosInstance } from 'axios';
-// FormData est disponible nativement dans le browser
+import FormData from 'form-data';
 
 import { ApiError } from './ApiError';
 import type { ApiRequestOptions } from './ApiRequestOptions';
@@ -50,8 +50,8 @@ export const base64 = (str: string): string => {
     try {
         return btoa(str);
     } catch (err) {
-        // Fallback
-        return str;
+        // @ts-ignore
+        return Buffer.from(str).toString('base64');
     }
 };
 
@@ -152,7 +152,7 @@ export const getHeaders = async (config: OpenAPIConfig, options: ApiRequestOptio
         resolve(options, config.HEADERS),
     ]);
 
-    const formHeaders = {}
+    const formHeaders = typeof formData?.getHeaders === 'function' && formData?.getHeaders() || {}
 
     const headers = Object.entries({
         Accept: 'application/json',
