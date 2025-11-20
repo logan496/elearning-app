@@ -33,14 +33,18 @@ export default function HomePage() {
                         size="lg"
                         className="text-lg px-8 hover:scale-105 transition-transform duration-200 hover:shadow-lg"
                     >
-                      {t.home.hero.cta_start}
+                      <Link href={"/login"}>
+                        {t.home.hero.cta_start}
+                      </Link>
                     </Button>
                     <Button
                         size="lg"
                         variant="outline"
                         className="text-lg px-8 bg-transparent hover:scale-105 transition-transform duration-200 hover:bg-accent"
                     >
-                      {t.home.hero.cta_discover}
+                      <Link href={"/courses"}>
+                        {t.home.hero.cta_discover}
+                      </Link>
                     </Button>
                   </div>
                 </div>

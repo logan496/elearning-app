@@ -18,6 +18,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { SocialMediaShare } from "@/components/social-media-share"
 import { useAuth } from "@/lib/contexts/auth-context"
+import { MediaUpload } from "@/components/media-upload"
+import { ThumbnailUpload } from "@/components/thumbnail-upload"
 
 export default function NewPodcastPage() {
   const router = useRouter()
@@ -43,12 +45,11 @@ export default function NewPodcastPage() {
   useEffect(() => {
     if (!user || !token) {
       toast.error("Vous devez être connecté pour créer un podcast")
-      router.push('/login')
+      router.push("/login")
     }
   }, [user, token, router])
 
-  const handleMediaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+  const handleMediaChange = (file: File | null, preview: string) => {
     if (!file) return
 
     const maxSize = formData.type === "audio" ? 20 * 1024 * 1024 : 50 * 1024 * 1024
@@ -58,13 +59,10 @@ export default function NewPodcastPage() {
     }
 
     setMediaFile(file)
-    if (formData.type === "video") {
-      setMediaPreview(URL.createObjectURL(file))
-    }
+    setMediaPreview(preview)
   }
 
-  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+  const handleThumbnailChange = (file: File | null, preview: string) => {
     if (!file) return
 
     if (file.size > 5 * 1024 * 1024) {
@@ -73,7 +71,7 @@ export default function NewPodcastPage() {
     }
 
     setThumbnailFile(file)
-    setThumbnailPreview(URL.createObjectURL(file))
+    setThumbnailPreview(preview)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -82,7 +80,7 @@ export default function NewPodcastPage() {
     // ✅ Vérification du token avant la soumission
     if (!token) {
       toast.error("Session expirée. Veuillez vous reconnecter.")
-      router.push('/login')
+      router.push("/login")
       return
     }
 
@@ -101,48 +99,48 @@ export default function NewPodcastPage() {
 
       const formDataToSend = new FormData()
 
-      formDataToSend.append('title', formData.title)
-      formDataToSend.append('description', formData.description)
-      formDataToSend.append('type', formData.type)
-      formDataToSend.append('duration', String(formData.duration * 60))
+      formDataToSend.append("title", formData.title)
+      formDataToSend.append("description", formData.description)
+      formDataToSend.append("type", formData.type)
+      formDataToSend.append("duration", String(formData.duration * 60))
 
       if (formData.category) {
-        formDataToSend.append('category', formData.category)
+        formDataToSend.append("category", formData.category)
       }
 
       if (formData.tags) {
-        formDataToSend.append('tags', formData.tags)
+        formDataToSend.append("tags", formData.tags)
       }
 
-      formDataToSend.append('autoShareOnPublish', String(formData.autoShareOnPublish))
-      formDataToSend.append('mediaFile', mediaFile)
+      formDataToSend.append("autoShareOnPublish", String(formData.autoShareOnPublish))
+      formDataToSend.append("mediaFile", mediaFile)
 
       if (thumbnailFile) {
-        formDataToSend.append('thumbnailFile', thumbnailFile)
+        formDataToSend.append("thumbnailFile", thumbnailFile)
       }
 
-      console.log('Envoi de la requête avec le token:', token ? 'Token présent' : 'Token absent')
+      console.log("Envoi de la requête avec le token:", token ? "Token présent" : "Token absent")
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/podcasts`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: formDataToSend,
       })
 
-      console.log('Statut de la réponse:', response.status)
+      console.log("Statut de la réponse:", response.status)
 
       if (!response.ok) {
         // ✅ Gérer les erreurs d'authentification
         if (response.status === 401 || response.status === 403) {
           toast.error("Session expirée. Veuillez vous reconnecter.")
-          router.push('/login')
+          router.push("/login")
           return
         }
 
-        const error = await response.json().catch(() => ({ message: 'Erreur inconnue' }))
-        throw new Error(error.message || 'Erreur lors de la création')
+        const error = await response.json().catch(() => ({ message: "Erreur inconnue" }))
+        throw new Error(error.message || "Erreur lors de la création")
       }
 
       const podcast = await response.json()
@@ -254,84 +252,26 @@ export default function NewPodcastPage() {
                     </Select>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="mediaFile">
-                      Fichier {formData.type} *{" "}
-                      {mediaFile && (
-                        <span className="text-sm text-muted-foreground">
-                          ({(mediaFile.size / 1024 / 1024).toFixed(2)} MB)
-                        </span>
-                      )}
-                    </Label>
-                    <div className="flex items-center gap-4">
-                      <Input
-                        id="mediaFile"
-                        type="file"
-                        accept={formData.type === "audio" ? "audio/*" : "video/*"}
-                        onChange={handleMediaChange}
-                        className="cursor-pointer"
-                      />
-                      {mediaFile && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setMediaFile(null)
-                            setMediaPreview("")
-                          }}
-                        >
-                          Supprimer
-                        </Button>
-                      )}
-                    </div>
-                    {mediaPreview && formData.type === "video" && (
-                      <video src={mediaPreview} controls className="w-full max-h-64 rounded-lg bg-black" />
-                    )}
-                    {mediaFile && formData.type === "audio" && (
-                      <div className="p-4 bg-muted rounded-lg flex items-center gap-3">
-                        <Music className="h-8 w-8 text-primary" />
-                        <div>
-                          <p className="font-medium">{mediaFile.name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {(mediaFile.size / 1024 / 1024).toFixed(2)} MB
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                  <MediaUpload
+                    type={formData.type}
+                    file={mediaFile}
+                    preview={mediaPreview}
+                    onFileSelected={handleMediaChange}
+                    onFileRemoved={() => {
+                      setMediaFile(null)
+                      setMediaPreview("")
+                    }}
+                  />
 
-                  <div className="space-y-2">
-                    <Label htmlFor="thumbnailFile">Image miniature (optionnel, max 5MB)</Label>
-                    <Input
-                      id="thumbnailFile"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleThumbnailChange}
-                      className="cursor-pointer"
-                    />
-                    {thumbnailPreview && (
-                      <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-muted">
-                        <img
-                          src={thumbnailPreview || "/placeholder.svg"}
-                          alt="Aperçu"
-                          className="w-full h-full object-cover"
-                        />
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="sm"
-                          className="absolute top-2 right-2"
-                          onClick={() => {
-                            setThumbnailFile(null)
-                            setThumbnailPreview("")
-                          }}
-                        >
-                          Supprimer
-                        </Button>
-                      </div>
-                    )}
-                  </div>
+                  <ThumbnailUpload
+                    file={thumbnailFile}
+                    preview={thumbnailPreview}
+                    onFileSelected={handleThumbnailChange}
+                    onFileRemoved={() => {
+                      setThumbnailFile(null)
+                      setThumbnailPreview("")
+                    }}
+                  />
                 </CardContent>
               </Card>
 

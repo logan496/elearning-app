@@ -6,12 +6,14 @@ import { Navigation } from "@/components/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Play, Clock, Calendar, Music, Video, Search, Heart } from "lucide-react"
+import { Play, Clock, Calendar, Music, Video, Search, Heart } from 'lucide-react'
 import { useI18n } from "@/lib/i18n-context"
 import { PodcastsService } from "@/lib/api/generated/services/PodcastsService"
 import { useState, useEffect } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
+import { PodcastPlayerModal } from "@/components/podcast-player-modal"
+import { getThumbnailUrl, getMediaUrl } from "@/lib/utils/media"
 
 const PodcastsPage = () => {
   const { t } = useI18n()
@@ -20,6 +22,8 @@ const PodcastsPage = () => {
   const [searchQuery, setSearchQuery] = useState("")
   const [filterType, setFilterType] = useState<string>("all")
   const [filterCategory, setFilterCategory] = useState<string>("all")
+  const [selectedPodcast, setSelectedPodcast] = useState<any>(null)
+  const [isPlayerOpen, setIsPlayerOpen] = useState(false)
 
   useEffect(() => {
     loadPodcasts()
@@ -34,8 +38,11 @@ const PodcastsPage = () => {
         filterType !== "all" ? filterType : undefined,
         filterCategory !== "all" ? filterCategory : undefined,
       )
-      console.log("[v0] API Response:", data)
       const podcastsArray = data?.podcasts || []
+      console.log('[v0] Loaded podcasts:', podcastsArray)
+      if (podcastsArray.length > 0) {
+        console.log('[v0] First podcast sample:', podcastsArray[0])
+      }
       setPodcasts(Array.isArray(podcastsArray) ? podcastsArray : [])
     } catch (error) {
       console.error("Failed to load podcasts:", error)
@@ -62,6 +69,11 @@ const PodcastsPage = () => {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handlePlayPodcast = (podcast: any) => {
+    setSelectedPodcast(podcast)
+    setIsPlayerOpen(true)
   }
 
   const categories = Array.from(new Set(podcasts.map((p) => p.category).filter(Boolean)))
@@ -149,88 +161,113 @@ const PodcastsPage = () => {
             </Card>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {podcasts.map((podcast) => (
-                <Card
-                  key={podcast.id}
-                  className="overflow-hidden group hover:shadow-2xl transition-all duration-300 hover:border-primary/50 hover:scale-105"
-                >
-                  <div className="aspect-video bg-muted relative overflow-hidden">
-                    {podcast.thumbnailUrl ? (
-                      <img
-                        src={podcast.thumbnailUrl || "/placeholder.svg"}
-                        alt={podcast.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5">
+              {podcasts.map((podcast) => {
+                const thumbnailUrl = getThumbnailUrl(podcast.coverImage, podcast.thumbnailUrl)
+                console.log('[v0] Podcast:', podcast.title, 'thumbnailUrl:', thumbnailUrl)
+
+                return (
+                  <Card
+                    key={podcast.id}
+                    className="overflow-hidden group hover:shadow-2xl transition-all duration-300 hover:border-primary/50 hover:scale-105 cursor-pointer"
+                    onClick={() => handlePlayPodcast(podcast)}
+                  >
+                    <div className="aspect-video bg-muted relative overflow-hidden">
+                      {thumbnailUrl ? (
+                        <img
+                          src={thumbnailUrl || "/placeholder.svg"}
+                          alt={podcast.title}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          onError={(e) => {
+                            console.error('[v0] Image failed to load:', thumbnailUrl)
+                            e.currentTarget.style.display = 'none'
+                          }}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5">
+                          {podcast.type === "audio" ? (
+                            <Music className="h-20 w-20 text-primary" />
+                          ) : (
+                            <Video className="h-20 w-20 text-primary" />
+                          )}
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+                        <Button
+                          size="lg"
+                          className="rounded-full w-14 h-14 p-0 scale-90 group-hover:scale-100 transition-transform duration-300"
+                          variant="secondary"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handlePlayPodcast(podcast)
+                          }}
+                        >
+                          <Play className="w-5 h-5 ml-0.5" fill="currentColor" />
+                        </Button>
+                      </div>
+                      <Badge
+                        className="absolute top-2 left-2"
+                        variant={podcast.type === "audio" ? "default" : "secondary"}
+                      >
                         {podcast.type === "audio" ? (
-                          <Music className="h-20 w-20 text-primary" />
+                          <>
+                            <Music className="h-3 w-3 mr-1" /> Audio
+                          </>
                         ) : (
-                          <Video className="h-20 w-20 text-primary" />
+                          <>
+                            <Video className="h-3 w-3 mr-1" /> Vidéo
+                          </>
+                        )}
+                      </Badge>
+                      {podcast.category && (
+                        <Badge className="absolute top-2 right-2" variant="outline">
+                          {podcast.category}
+                        </Badge>
+                      )}
+                    </div>
+                    <CardContent className="p-6">
+                      <h3 className="text-xl font-semibold mb-3 text-balance group-hover:text-primary transition-colors duration-300 line-clamp-2">
+                        {podcast.title}
+                      </h3>
+                      <p className="text-muted-foreground mb-4 leading-relaxed text-sm line-clamp-2">
+                        {podcast.description}
+                      </p>
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-1.5">
+                            <Clock className="w-3.5 h-3.5" />
+                            <span>{podcast.duration} min</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <Calendar className="w-3.5 h-3.5" />
+                            <span>{new Date(podcast.createdAt).toLocaleDateString("fr-FR")}</span>
+                          </div>
+                        </div>
+                        {podcast.likesCount !== undefined && (
+                          <div className="flex items-center gap-1.5">
+                            <Heart className="w-3.5 h-3.5" />
+                            <span>{podcast.likesCount}</span>
+                          </div>
                         )}
                       </div>
-                    )}
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
-                      <Button
-                        size="lg"
-                        className="rounded-full w-14 h-14 p-0 scale-90 group-hover:scale-100 transition-transform duration-300"
-                        variant="secondary"
-                      >
-                        <Play className="w-5 h-5 ml-0.5" fill="currentColor" />
-                      </Button>
-                    </div>
-                    <Badge
-                      className="absolute top-2 left-2"
-                      variant={podcast.type === "audio" ? "default" : "secondary"}
-                    >
-                      {podcast.type === "audio" ? (
-                        <>
-                          <Music className="h-3 w-3 mr-1" /> Audio
-                        </>
-                      ) : (
-                        <>
-                          <Video className="h-3 w-3 mr-1" /> Vidéo
-                        </>
-                      )}
-                    </Badge>
-                    {podcast.category && (
-                      <Badge className="absolute top-2 right-2" variant="outline">
-                        {podcast.category}
-                      </Badge>
-                    )}
-                  </div>
-                  <CardContent className="p-6">
-                    <h3 className="text-xl font-semibold mb-3 text-balance group-hover:text-primary transition-colors duration-300 line-clamp-2">
-                      {podcast.title}
-                    </h3>
-                    <p className="text-muted-foreground mb-4 leading-relaxed text-sm line-clamp-2">
-                      {podcast.description}
-                    </p>
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-1.5">
-                          <Clock className="w-3.5 h-3.5" />
-                          <span>{podcast.duration} min</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5" />
-                          <span>{new Date(podcast.createdAt).toLocaleDateString("fr-FR")}</span>
-                        </div>
-                      </div>
-                      {podcast.likesCount !== undefined && (
-                        <div className="flex items-center gap-1.5">
-                          <Heart className="w-3.5 h-3.5" />
-                          <span>{podcast.likesCount}</span>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                )
+              })}
             </div>
           )}
         </div>
       </div>
+
+      {selectedPodcast && (
+        <PodcastPlayerModal
+          isOpen={isPlayerOpen}
+          onClose={() => setIsPlayerOpen(false)}
+          podcast={{
+            ...selectedPodcast,
+            mediaUrl: getMediaUrl(selectedPodcast.mediaUrl) || `/api/media/${selectedPodcast.id}`,
+          }}
+        />
+      )}
     </div>
   )
 }
